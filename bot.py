@@ -428,17 +428,45 @@ async def banner(ctx, member: discord.Member = None):
     # Set user avatar as thumbnail
     embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
 
-    # Check if user has a banner
-    if member.banner:
-        embed.set_image(url=member.banner.url)
-        embed.add_field(name="User", value=member.mention, inline=True)
-        embed.add_field(name="User ID", value=member.id, inline=True)
-        embed.add_field(name="Status", value="✅ Has Banner", inline=True)
-    else:
+    try:
+        # Use Discord API to get user data including banner
+        headers = {"Authorization": f"Bot {TOKEN}"}
+        response = requests.get(f"https://discord.com/api/v10/users/{member.id}", headers=headers)
+
+        if response.status_code == 200:
+            user_data = response.json()
+
+            # Check if user has a banner
+            if user_data.get('banner'):
+                banner_hash = user_data['banner']
+                # Try GIF first (animated banner), then PNG (static banner)
+                banner_gif_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.gif?size=1024"
+                banner_png_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.png?size=1024"
+
+                # Try to use the banner (Discord will redirect to the correct format)
+                embed.set_image(url=banner_gif_url)
+                embed.add_field(name="User", value=member.mention, inline=True)
+                embed.add_field(name="User ID", value=member.id, inline=True)
+                embed.add_field(name="Status", value="✅ Has Banner", inline=True)
+            else:
+                embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
+                embed.add_field(name="User", value=member.mention, inline=True)
+                embed.add_field(name="User ID", value=member.id, inline=True)
+                embed.add_field(name="Status", value="❌ No Banner", inline=True)
+        else:
+            # If API call fails, show default image
+            embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
+            embed.add_field(name="User", value=member.mention, inline=True)
+            embed.add_field(name="User ID", value=member.id, inline=True)
+            embed.add_field(name="Status", value="❌ API Error", inline=True)
+
+    except Exception as e:
+        # If all methods fail, show default image
         embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
         embed.add_field(name="User", value=member.mention, inline=True)
         embed.add_field(name="User ID", value=member.id, inline=True)
-        embed.add_field(name="Status", value="❌ No Banner", inline=True)
+        embed.add_field(name="Status", value="❌ Error Loading", inline=True)
+        print(f"Error loading banner: {e}")
 
     embed.set_footer(text="Use !banner @user to see someone else's banner")
     await ctx.send(embed=embed)
