@@ -17,8 +17,360 @@ TOKEN = os.getenv('DISCORD_BOT_TOKEN')
 intents = discord.Intents.default()
 intents.message_content = True
 intents.members = True
+intents.guilds = True
+intents.moderation = True
+intents.messages = True
 
 bot = commands.Bot(command_prefix='!', intents=intents, help_command=None)
+
+# Log configuration storage (guild_id -> channel_id)
+log_channels = {}
+
+# Slash Commands
+@bot.tree.command(name="logs", description="Configure logging for server events")
+@commands.has_permissions(administrator=True)
+async def setup_logs(interaction: discord.Interaction, channel: discord.TextChannel):
+    """Set up logging for server events"""
+    guild_id = interaction.guild.id
+
+    # Store the log channel for this guild
+    log_channels[guild_id] = channel.id
+
+    embed = discord.Embed(
+        title="📋 Logging Configured",
+        description=f"✅ Server logs will now be sent to {channel.mention}",
+        color=0x00ff00
+    )
+
+    embed.add_field(
+        name="📊 Events Logged",
+        value="• Member joins/leaves\n"
+              "• Messages deleted\n"
+              "• Role changes\n"
+              "• Channel updates\n"
+              "• Moderation actions",
+        inline=False
+    )
+
+    embed.set_footer(text="Use /logs-disable to stop logging")
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    # Send a test message to the log channel
+    test_embed = discord.Embed(
+        title="🔧 Logging System Activated",
+        description="Server logging has been configured and is now active.",
+        color=0x0099ff
+    )
+    test_embed.add_field(name="📝 Log Channel", value=channel.mention, inline=True)
+    test_embed.add_field(name="⚙️ Configured by", value=interaction.user.mention, inline=True)
+    test_embed.set_footer(text=f"Server: {interaction.guild.name}")
+
+    try:
+        await channel.send(embed=test_embed)
+    except discord.Forbidden:
+        await interaction.followup.send("❌ I don't have permission to send messages to the log channel.", ephemeral=True)
+
+@bot.tree.command(name="logs-disable", description="Disable logging for server events")
+@commands.has_permissions(administrator=True)
+async def disable_logs(interaction: discord.Interaction):
+    """Disable logging for server events"""
+    guild_id = interaction.guild.id
+
+    if guild_id not in log_channels:
+        await interaction.response.send_message("❌ Logging is not currently configured for this server.", ephemeral=True)
+        return
+
+    # Remove the log channel configuration
+    del log_channels[guild_id]
+
+    embed = discord.Embed(
+        title="📋 Logging Disabled",
+        description="✅ Server logging has been disabled.",
+        color=0xff0000
+    )
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+    # Send a notification to the previously configured channel
+    try:
+        channel = bot.get_channel(log_channels.get(guild_id))
+        if channel:
+            disable_embed = discord.Embed(
+                title="🔧 Logging System Deactivated",
+                description="Server logging has been disabled.",
+                color=0xff0000
+            )
+            disable_embed.add_field(name="⚙️ Disabled by", value=interaction.user.mention, inline=True)
+            await channel.send(embed=disable_embed)
+    except:
+        pass  # If we can't send to the channel, just continue
+
+@bot.tree.command(name="logs-status", description="Check logging status")
+async def logs_status(interaction: discord.Interaction):
+    """Check the current logging status"""
+    guild_id = interaction.guild.id
+
+    if guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+        embed = discord.Embed(
+            title="📊 Logging Status: Active",
+            description=f"✅ Server logs are being sent to {channel.mention}",
+            color=0x00ff00
+        )
+    else:
+        embed = discord.Embed(
+            title="📊 Logging Status: Inactive",
+            description="❌ Server logging is not configured.\nUse `/logs #channel` to set up logging.",
+            color=0xff0000
+        )
+
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+
+# Event Listeners for Logging
+@bot.event
+async def on_member_join(member):
+    """Log when a member joins the server"""
+    guild_id = member.guild.id
+
+    if guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="👋 Member Joined",
+            description=f"{member.mention} joined the server",
+            color=0x00ff00
+        )
+
+        embed.add_field(name="👤 User", value=f"{member.name}#{member.discriminator}", inline=True)
+        embed.add_field(name="🆔 User ID", value=member.id, inline=True)
+        embed.add_field(name="📅 Account Created", value=member.created_at.strftime("%B %d, %Y"), inline=True)
+
+        embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+        embed.set_footer(text=f"Member count: {member.guild.member_count}")
+
+        try:
+            await channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
+
+@bot.event
+async def on_member_remove(member):
+    """Log when a member leaves the server"""
+    guild_id = member.guild.id
+
+    if guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="👋 Member Left",
+            description=f"{member.mention} left the server",
+            color=0xff0000
+        )
+
+        embed.add_field(name="👤 User", value=f"{member.name}#{member.discriminator}", inline=True)
+        embed.add_field(name="🆔 User ID", value=member.id, inline=True)
+        embed.add_field(name="📅 Joined", value=member.joined_at.strftime("%B %d, %Y") if member.joined_at else "Unknown", inline=True)
+
+        embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+        embed.set_footer(text=f"Member count: {member.guild.member_count}")
+
+        try:
+            await channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
+
+@bot.event
+async def on_message_delete(message):
+    """Log when a message is deleted"""
+    guild_id = message.guild.id if message.guild else None
+
+    if guild_id and guild_id in log_channels and message.author.bot == False:
+        channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="🗑️ Message Deleted",
+            description=f"Message deleted in {message.channel.mention}",
+            color=0xff9900
+        )
+
+        embed.add_field(name="👤 Author", value=f"{message.author.mention}", inline=True)
+        embed.add_field(name="📝 Channel", value=message.channel.name, inline=True)
+        embed.add_field(name="🕐 Time", value=message.created_at.strftime("%H:%M:%S"), inline=True)
+
+        if message.content:
+            embed.add_field(name="📄 Content", value=message.content[:1024], inline=False)
+
+        if message.attachments:
+            embed.add_field(name="📎 Attachments", value=f"{len(message.attachments)} file(s)", inline=True)
+
+        embed.set_footer(text=f"Message ID: {message.id}")
+
+        try:
+            await channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
+
+@bot.event
+async def on_bulk_message_delete(messages):
+    """Log when multiple messages are deleted"""
+    if not messages:
+        return
+
+    guild_id = messages[0].guild.id if messages[0].guild else None
+
+    if guild_id and guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="🗑️ Bulk Message Delete",
+            description=f"{len(messages)} messages deleted in {messages[0].channel.mention}",
+            color=0xff6600
+        )
+
+        embed.add_field(name="📝 Channel", value=messages[0].channel.name, inline=True)
+        embed.add_field(name="👥 Affected Users", value=len(set(msg.author for msg in messages if not msg.author.bot)), inline=True)
+
+        # Show some sample content if available
+        content_samples = []
+        for msg in messages[:3]:  # Show first 3 messages
+            if msg.content and not msg.author.bot:
+                content_samples.append(f"{msg.author.display_name}: {msg.content[:100]}...")
+
+        if content_samples:
+            embed.add_field(name="📄 Sample Content", value="\n".join(content_samples), inline=False)
+
+        embed.set_footer(text=f"Channel: {messages[0].channel.name}")
+
+        try:
+            await channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
+
+@bot.event
+async def on_member_update(before, after):
+    """Log when a member is updated (role changes, nickname changes, etc.)"""
+    guild_id = after.guild.id
+
+    if guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+
+        # Check for nickname changes
+        if before.nick != after.nick:
+            embed = discord.Embed(
+                title="📝 Nickname Changed",
+                description=f"{after.mention}'s nickname was changed",
+                color=0x0099ff
+            )
+
+            embed.add_field(name="👤 User", value=f"{after.name}#{after.discriminator}", inline=True)
+            embed.add_field(name="🆔 User ID", value=after.id, inline=True)
+            embed.add_field(name="📝 Before", value=before.nick or "None", inline=True)
+            embed.add_field(name="📝 After", value=after.nick or "None", inline=True)
+
+            embed.set_thumbnail(url=after.avatar.url if after.avatar else after.default_avatar.url)
+
+            try:
+                await channel.send(embed=embed)
+            except discord.Forbidden:
+                pass  # Can't send to channel
+
+        # Check for role changes
+        if before.roles != after.roles:
+            added_roles = [role for role in after.roles if role not in before.roles]
+            removed_roles = [role for role in before.roles if role not in after.roles]
+
+            if added_roles:
+                embed = discord.Embed(
+                    title="➕ Role Added",
+                    description=f"{after.mention} was given a role",
+                    color=0x00ff00
+                )
+
+                embed.add_field(name="👤 User", value=f"{after.name}#{after.discriminator}", inline=True)
+                embed.add_field(name="🆔 User ID", value=after.id, inline=True)
+                embed.add_field(name="➕ Added Role", value=", ".join(role.mention for role in added_roles), inline=False)
+
+                embed.set_thumbnail(url=after.avatar.url if after.avatar else after.default_avatar.url)
+
+                try:
+                    await channel.send(embed=embed)
+                except discord.Forbidden:
+                    pass  # Can't send to channel
+
+            if removed_roles:
+                embed = discord.Embed(
+                    title="➖ Role Removed",
+                    description=f"{after.mention} had a role removed",
+                    color=0xff0000
+                )
+
+                embed.add_field(name="👤 User", value=f"{after.name}#{after.discriminator}", inline=True)
+                embed.add_field(name="🆔 User ID", value=after.id, inline=True)
+                embed.add_field(name="➖ Removed Role", value=", ".join(role.mention for role in removed_roles), inline=False)
+
+                embed.set_thumbnail(url=after.avatar.url if after.avatar else after.default_avatar.url)
+
+                try:
+                    await channel.send(embed=embed)
+                except discord.Forbidden:
+                    pass  # Can't send to channel
+
+@bot.event
+async def on_guild_channel_create(channel):
+    """Log when a channel is created"""
+    guild_id = channel.guild.id
+
+    if guild_id in log_channels:
+        log_channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="📺 Channel Created",
+            description=f"New channel created: {channel.mention}",
+            color=0x00ff00
+        )
+
+        embed.add_field(name="📝 Channel Name", value=channel.name, inline=True)
+        embed.add_field(name="📝 Channel Type", value=str(channel.type).title(), inline=True)
+        embed.add_field(name="🆔 Channel ID", value=channel.id, inline=True)
+
+        if hasattr(channel, 'category') and channel.category:
+            embed.add_field(name="📁 Category", value=channel.category.name, inline=True)
+
+        embed.set_footer(text=f"Created by: {channel.guild.name}")
+
+        try:
+            await log_channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
+
+@bot.event
+async def on_guild_channel_delete(channel):
+    """Log when a channel is deleted"""
+    guild_id = channel.guild.id
+
+    if guild_id in log_channels:
+        log_channel = bot.get_channel(log_channels[guild_id])
+
+        embed = discord.Embed(
+            title="📺 Channel Deleted",
+            description=f"Channel deleted: #{channel.name}",
+            color=0xff0000
+        )
+
+        embed.add_field(name="📝 Channel Name", value=channel.name, inline=True)
+        embed.add_field(name="📝 Channel Type", value=str(channel.type).title(), inline=True)
+        embed.add_field(name="🆔 Channel ID", value=channel.id, inline=True)
+
+        if hasattr(channel, 'category') and channel.category:
+            embed.add_field(name="📁 Category", value=channel.category.name, inline=True)
+
+        embed.set_footer(text=f"Deleted from: {channel.guild.name}")
+
+        try:
+            await log_channel.send(embed=embed)
+        except discord.Forbidden:
+            pass  # Can't send to channel
 
 # Bot events
 @bot.event
