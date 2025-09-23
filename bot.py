@@ -439,8 +439,8 @@ async def banner(ctx, member: discord.Member = None):
             # Check if user has a banner
             if user_data.get('banner'):
                 banner_hash = user_data['banner']
-                # Construct banner URL without size parameter first
-                banner_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.png"
+                # Construct banner URL with larger size for better display
+                banner_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.png?size=1024"
 
                 # Set the banner image
                 embed.set_image(url=banner_url)
