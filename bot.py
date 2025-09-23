@@ -904,7 +904,7 @@ last_help_execution = {}
 async def help_command(ctx):
     """Interactive help with categories and buttons"""
     embed = discord.Embed(
-        title="🤖 Comandos del Bot",
+        title="🤖 Comandos del Bot - Sistema Mejorado",
         description="¡Bienvenido al sistema de ayuda interactivo!\n\n"
                    "Usa los botones para navegar por las diferentes categorías de comandos.\n"
                    "Cada categoría contiene comandos relacionados agrupados por funcionalidad.",
@@ -913,8 +913,8 @@ async def help_command(ctx):
 
     embed.add_field(
         name="📊 Estadísticas",
-        value=f"**Categorías:** 6\n"
-              f"**Comandos totales:** 30+\n"
+        value=f"**Categorías:** 10\n"
+              f"**Comandos totales:** 100+\n"
               f"**Última actualización:** {datetime.now().strftime('%d/%m/%Y')}",
         inline=False
     )
