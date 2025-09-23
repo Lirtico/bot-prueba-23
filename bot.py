@@ -485,6 +485,23 @@ async def unjail(ctx, member: discord.Member = None, *, reason=None):
     try:
         jail_info = jail_data[guild_id][member.id]
 
+        # Find and remove the "jailed" role first
+        jailed_role = None
+        for role in ctx.guild.roles:
+            if role.name == "jailed":
+                jailed_role = role
+                break
+
+        if jailed_role:
+            try:
+                await member.remove_roles(jailed_role, reason=f"User released from jail by {ctx.author.name}")
+            except discord.Forbidden:
+                await ctx.send("❌ I don't have permission to remove the jailed role.")
+                return
+            except discord.HTTPException as e:
+                await ctx.send(f"❌ Failed to remove jailed role: {e}")
+                return
+
         # Restore original roles
         for role_id in jail_info['original_roles']:
             role = ctx.guild.get_role(role_id)
