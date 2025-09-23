@@ -913,8 +913,8 @@ async def help_command(ctx):
 
     embed.add_field(
         name="📊 Estadísticas",
-        value=f"**Categorías:** 10\n"
-              f"**Comandos totales:** 100+\n"
+        value=f"**Categorías:** 7\n"
+              f"**Comandos totales:** 80+\n"
               f"**Última actualización:** {datetime.now().strftime('%d/%m/%Y')}",
         inline=False
     )
