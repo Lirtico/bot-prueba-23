@@ -127,6 +127,385 @@ async def logs_status(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
+@bot.tree.command(name="setup-logs", description="Create logs-server channel and configure logging")
+@commands.has_permissions(administrator=True)
+async def setup_logs_auto(interaction: discord.Interaction):
+    """Create a logs-server channel and set up logging automatically"""
+    guild_id = interaction.guild.id
+
+    # Check if logging is already configured
+    if guild_id in log_channels:
+        channel = bot.get_channel(log_channels[guild_id])
+        await interaction.response.send_message(
+            f"❌ Logging is already configured for {channel.mention}. Use `/logs-disable` first if you want to reconfigure.",
+            ephemeral=True
+        )
+        return
+
+    try:
+        # Create the logs-server channel
+        overwrites = {
+            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
+            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True)
+        }
+
+        logs_channel = await interaction.guild.create_text_channel(
+            name="logs-server",
+            overwrites=overwrites,
+            reason="Auto-created by setup-logs command"
+        )
+
+        # Configure logging to use this channel
+        log_channels[guild_id] = logs_channel.id
+
+        embed = discord.Embed(
+            title="📋 Logging System Setup Complete",
+            description=f"✅ Created {logs_channel.mention} and configured server logging!",
+            color=0x00ff00
+        )
+
+        embed.add_field(
+            name="📊 Events Logged",
+            value="• Member joins/leaves\n"
+                  "• Messages deleted\n"
+                  "• Role changes\n"
+                  "• Channel updates\n"
+                  "• Moderation actions",
+            inline=False
+        )
+
+        embed.add_field(
+            name="🔧 Channel Permissions",
+            value="• Everyone can read messages\n"
+                  "• Only bot can send messages\n"
+                  "• Bot can manage messages",
+            inline=False
+        )
+
+        embed.set_footer(text="Use /logs-disable to stop logging")
+
+        await interaction.response.send_message(embed=embed, ephemeral=True)
+
+        # Send a test message to the log channel
+        test_embed = discord.Embed(
+            title="🔧 Logging System Activated",
+            description="Server logging has been configured and is now active.",
+            color=0x0099ff
+        )
+        test_embed.add_field(name="📝 Log Channel", value=logs_channel.mention, inline=True)
+        test_embed.add_field(name="⚙️ Configured by", value=interaction.user.mention, inline=True)
+        test_embed.add_field(name="🚀 Setup Method", value="Auto-created channel", inline=True)
+        test_embed.set_footer(text=f"Server: {interaction.guild.name}")
+
+        await logs_channel.send(embed=test_embed)
+
+    except discord.Forbidden:
+        await interaction.response.send_message(
+            "❌ I don't have permission to create channels in this server.",
+            ephemeral=True
+        )
+    except discord.HTTPException as e:
+        await interaction.response.send_message(
+            f"❌ Failed to create logs channel: {e}",
+            ephemeral=True
+        )
+
+# Jail System Storage (guild_id -> {user_id -> jail_data})
+jail_data = {}
+
+@bot.command(name='jail')
+@commands.has_permissions(manage_roles=True)
+async def jail(ctx, member: discord.Member = None, *, reason=None):
+    """Jail a user - works with mentions or replies"""
+    # Handle reply context
+    if member is None and ctx.message.reference:
+        try:
+            replied_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            member = replied_message.author
+        except:
+            pass
+
+    if member is None:
+        await ctx.send("❌ Please mention a user or reply to their message to jail them.")
+        return
+
+    if member == ctx.author:
+        await ctx.send("❌ You can't jail yourself!")
+        return
+
+    if member.bot:
+        await ctx.send("❌ You can't jail bots!")
+        return
+
+    if ctx.author.top_role <= member.top_role:
+        await ctx.send("❌ You can't jail someone with a higher or equal role!")
+        return
+
+    guild_id = ctx.guild.id
+
+    # Check if user is already jailed
+    if guild_id in jail_data and member.id in jail_data[guild_id]:
+        await ctx.send(f"❌ {member.mention} is already in jail!")
+        return
+
+    try:
+        # Create jail channel if it doesn't exist
+        jail_channel = None
+        for channel in ctx.guild.channels:
+            if channel.name == "jail":
+                jail_channel = channel
+                break
+
+        if jail_channel is None:
+            # Create jail channel
+            overwrites = {
+                ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+                ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True),
+                member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+            }
+
+            jail_channel = await ctx.guild.create_text_channel(
+                name="jail",
+                overwrites=overwrites,
+                reason=f"Jail channel created for {member.name}"
+            )
+
+        # Store original roles
+        original_roles = [role.id for role in member.roles if role != ctx.guild.default_role]
+
+        # Remove all roles except @everyone
+        for role in member.roles[:]:  # Copy the list to avoid modification issues
+            if role != ctx.guild.default_role:
+                try:
+                    await member.remove_roles(role, reason=f"User jailed by {ctx.author.name}")
+                except discord.Forbidden:
+                    await ctx.send("❌ I don't have permission to remove roles from this user.")
+                    return
+                except discord.HTTPException as e:
+                    await ctx.send(f"❌ Failed to remove roles: {e}")
+                    return
+
+        # Store jail data
+        if guild_id not in jail_data:
+            jail_data[guild_id] = {}
+
+        jail_data[guild_id][member.id] = {
+            'original_roles': original_roles,
+            'jailed_by': ctx.author.id,
+            'reason': reason,
+            'timestamp': datetime.now().timestamp()
+        }
+
+        # Send jail notification
+        embed = discord.Embed(
+            title="🔒 User Jailed",
+            description=f"{member.mention} has been sent to jail!",
+            color=0xff0000
+        )
+
+        if reason:
+            embed.add_field(name="Reason", value=reason, inline=False)
+
+        embed.add_field(name="Jailed by", value=ctx.author.mention, inline=True)
+        embed.add_field(name="Jail Channel", value=jail_channel.mention, inline=True)
+        embed.add_field(name="Original Roles", value=len(original_roles), inline=True)
+
+        embed.set_footer(text=f"Use !unjail {member.mention} to release the user")
+
+        await ctx.send(embed=embed)
+
+        # Send message to jail channel
+        jail_embed = discord.Embed(
+            title="🔒 Welcome to Jail",
+            description=f"{member.mention}, you have been sent to jail!",
+            color=0xff0000
+        )
+
+        if reason:
+            jail_embed.add_field(name="Reason", value=reason, inline=False)
+
+        jail_embed.add_field(name="Jailed by", value=ctx.author.mention, inline=True)
+        jail_embed.add_field(name="Time", value=datetime.now().strftime("%B %d, %Y %H:%M"), inline=True)
+
+        jail_embed.set_footer(text="Contact a moderator if you believe this is a mistake")
+
+        await jail_channel.send(embed=jail_embed)
+
+        # Log the jail action if logging is enabled
+        if guild_id in log_channels:
+            log_channel = bot.get_channel(log_channels[guild_id])
+            log_embed = discord.Embed(
+                title="🔒 User Jailed",
+                description=f"{member.mention} was sent to jail",
+                color=0xff0000
+            )
+            log_embed.add_field(name="👤 User", value=f"{member.name}#{member.discriminator}", inline=True)
+            log_embed.add_field(name="🆔 User ID", value=member.id, inline=True)
+            log_embed.add_field(name="👮 Jailed by", value=ctx.author.mention, inline=True)
+            if reason:
+                log_embed.add_field(name="📝 Reason", value=reason, inline=False)
+
+            try:
+                await log_channel.send(embed=log_embed)
+            except discord.Forbidden:
+                pass
+
+    except discord.Forbidden:
+        await ctx.send("❌ I don't have permission to create channels or manage roles.")
+    except discord.HTTPException as e:
+        await ctx.send(f"❌ Failed to jail user: {e}")
+
+@bot.command(name='unjail')
+@commands.has_permissions(manage_roles=True)
+async def unjail(ctx, member: discord.Member = None, *, reason=None):
+    """Release a user from jail - works with mentions or replies"""
+    # Handle reply context
+    if member is None and ctx.message.reference:
+        try:
+            replied_message = await ctx.channel.fetch_message(ctx.message.reference.message_id)
+            member = replied_message.author
+        except:
+            pass
+
+    if member is None:
+        await ctx.send("❌ Please mention a user or reply to their message to unjail them.")
+        return
+
+    guild_id = ctx.guild.id
+
+    # Check if user is actually jailed
+    if guild_id not in jail_data or member.id not in jail_data[guild_id]:
+        await ctx.send(f"❌ {member.mention} is not in jail!")
+        return
+
+    try:
+        jail_info = jail_data[guild_id][member.id]
+
+        # Restore original roles
+        for role_id in jail_info['original_roles']:
+            role = ctx.guild.get_role(role_id)
+            if role:
+                try:
+                    await member.add_roles(role, reason=f"User released from jail by {ctx.author.name}")
+                except discord.Forbidden:
+                    await ctx.send(f"❌ I don't have permission to restore the role: {role.name}")
+                except discord.HTTPException as e:
+                    await ctx.send(f"❌ Failed to restore role {role.name}: {e}")
+
+        # Remove from jail data
+        del jail_data[guild_id][member.id]
+
+        # Send unjail notification
+        embed = discord.Embed(
+            title="🔓 User Released",
+            description=f"{member.mention} has been released from jail!",
+            color=0x00ff00
+        )
+
+        if reason:
+            embed.add_field(name="Reason", value=reason, inline=False)
+
+        embed.add_field(name="Released by", value=ctx.author.mention, inline=True)
+        embed.add_field(name="Time in Jail", value=f"{(datetime.now().timestamp() - jail_info['timestamp']) / 3600:.1f} hours", inline=True)
+
+        embed.set_footer(text="User has been restored to their original roles")
+
+        await ctx.send(embed=embed)
+
+        # Find jail channel and send release message
+        jail_channel = None
+        for channel in ctx.guild.channels:
+            if channel.name == "jail":
+                jail_channel = channel
+                break
+
+        if jail_channel:
+            release_embed = discord.Embed(
+                title="🔓 Released from Jail",
+                description=f"{member.mention}, you have been released from jail!",
+                color=0x00ff00
+            )
+
+            if reason:
+                release_embed.add_field(name="Reason", value=reason, inline=False)
+
+            release_embed.add_field(name="Released by", value=ctx.author.mention, inline=True)
+            release_embed.add_field(name="Time Served", value=f"{(datetime.now().timestamp() - jail_info['timestamp']) / 3600:.1f} hours", inline=True)
+
+            try:
+                await jail_channel.send(embed=release_embed)
+            except discord.Forbidden:
+                pass
+
+        # Log the unjail action if logging is enabled
+        if guild_id in log_channels:
+            log_channel = bot.get_channel(log_channels[guild_id])
+            log_embed = discord.Embed(
+                title="🔓 User Released from Jail",
+                description=f"{member.mention} was released from jail",
+                color=0x00ff00
+            )
+            log_embed.add_field(name="👤 User", value=f"{member.name}#{member.discriminator}", inline=True)
+            log_embed.add_field(name="🆔 User ID", value=member.id, inline=True)
+            log_embed.add_field(name="👮 Released by", value=ctx.author.mention, inline=True)
+            log_embed.add_field(name="⏱️ Time Served", value=f"{(datetime.now().timestamp() - jail_info['timestamp']) / 3600:.1f} hours", inline=True)
+
+            try:
+                await log_channel.send(embed=log_embed)
+            except discord.Forbidden:
+                pass
+
+    except discord.Forbidden:
+        await ctx.send("❌ I don't have permission to manage roles.")
+    except discord.HTTPException as e:
+        await ctx.send(f"❌ Failed to unjail user: {e}")
+
+@bot.command(name='jailstatus')
+@commands.has_permissions(manage_roles=True)
+async def jailstatus(ctx):
+    """Check who is currently in jail"""
+    guild_id = ctx.guild.id
+
+    if guild_id not in jail_data or not jail_data[guild_id]:
+        embed = discord.Embed(
+            title="🔒 Jail Status",
+            description="✅ No users are currently in jail.",
+            color=0x00ff00
+        )
+        await ctx.send(embed=embed)
+        return
+
+    embed = discord.Embed(
+        title="🔒 Jail Status",
+        description=f"📊 **Total jailed users:** {len(jail_data[guild_id])}",
+        color=0xff9900
+    )
+
+    for user_id, jail_info in jail_data[guild_id].items():
+        try:
+            user = await bot.fetch_user(user_id)
+            time_in_jail = datetime.now().timestamp() - jail_info['timestamp']
+            hours = time_in_jail / 3600
+
+            embed.add_field(
+                name=f"{user.name}#{user.discriminator}",
+                value=f"**ID:** {user_id}\n"
+                      f"**Jailed by:** <@{jail_info['jailed_by']}>\n"
+                      f"**Time:** {hours:.1f} hours\n"
+                      f"**Reason:** {jail_info['reason'] or 'No reason provided'}",
+                inline=False
+            )
+        except:
+            embed.add_field(
+                name=f"Unknown User ({user_id})",
+                value=f"**Time:** {(datetime.now().timestamp() - jail_info['timestamp']) / 3600:.1f} hours\n"
+                      f"**Reason:** {jail_info['reason'] or 'No reason provided'}",
+                inline=False
+            )
+
+    embed.set_footer(text="Use !unjail @user to release a user")
+    await ctx.send(embed=embed)
+
 # Event Listeners for Logging
 @bot.event
 async def on_member_join(member):
