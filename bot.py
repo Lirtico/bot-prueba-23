@@ -100,6 +100,7 @@ async def help_command(ctx):
             name="👤 User Commands",
             value="`!avatar [@user]` - Get user avatar\n"
                   "`!userinfo [@user]` - Get user information\n"
+                  "`!banner [@user]` - Get user banner\n"
                   "`!serverinfo` - Get server information",
             inline=False
         )
@@ -179,6 +180,7 @@ async def commands_list(ctx):
         "👤 **User Commands:**",
         "• `!avatar [@user]` - Get user avatar",
         "• `!userinfo [@user]` - Get user information",
+        "• `!banner [@user]` - Get user banner",
         "• `!serverinfo` - Get server information",
         "• `!roleinfo <role>` - Get role information",
         "• `!channelinfo [channel]` - Get channel info",
@@ -410,6 +412,35 @@ async def userinfo(ctx, member: discord.Member = None):
     # Add footer with links
     embed.set_footer(text="Created • Joined • Links • Avatar")
 
+    await ctx.send(embed=embed)
+
+@bot.command(name='banner')
+async def banner(ctx, member: discord.Member = None):
+    """Get a user's banner"""
+    if member is None:
+        member = ctx.author
+
+    embed = discord.Embed(
+        title=f"{member.display_name}'s Banner",
+        color=0x0099ff
+    )
+
+    # Set user avatar as thumbnail
+    embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+
+    # Check if user has a banner
+    if member.banner:
+        embed.set_image(url=member.banner.url)
+        embed.add_field(name="User", value=member.mention, inline=True)
+        embed.add_field(name="User ID", value=member.id, inline=True)
+        embed.add_field(name="Status", value="✅ Has Banner", inline=True)
+    else:
+        embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
+        embed.add_field(name="User", value=member.mention, inline=True)
+        embed.add_field(name="User ID", value=member.id, inline=True)
+        embed.add_field(name="Status", value="❌ No Banner", inline=True)
+
+    embed.set_footer(text="Use !banner @user to see someone else's banner")
     await ctx.send(embed=embed)
 
 @bot.command(name='serverinfo')
