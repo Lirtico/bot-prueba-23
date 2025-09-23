@@ -149,10 +149,18 @@ async def setup_koala_system(interaction: discord.Interaction):
             reason="Auto-created by setup command"
         )
 
-        # Create the logs-server channel
+        # Create the jailed role first
+        jailed_role = await interaction.guild.create_role(
+            name="jailed",
+            color=0x808080,  # Gray color
+            reason="Auto-created by setup command for jail system"
+        )
+
+        # Create the logs-server channel (private by default)
         logs_overwrites = {
-            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
-            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True)
+            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True),
+            interaction.guild.owner: discord.PermissionOverwrite(read_messages=True, send_messages=False)
         }
 
         logs_channel = await interaction.guild.create_text_channel(
@@ -290,26 +298,51 @@ async def jail(ctx, member: discord.Member = None, *, reason=None):
         return
 
     try:
-        # Create jail channel if it doesn't exist
+        # Find jail channel in "koala setup" category
         jail_channel = None
-        for channel in ctx.guild.channels:
-            if channel.name == "jail":
-                jail_channel = channel
+        koala_category = None
+
+        # Find the koala setup category
+        for category in ctx.guild.categories:
+            if category.name == "koala setup":
+                koala_category = category
                 break
 
-        if jail_channel is None:
-            # Create jail channel
-            overwrites = {
-                ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
-                ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True),
-                member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
-            }
+        if koala_category:
+            # Look for jail channel in the koala setup category
+            for channel in koala_category.channels:
+                if channel.name == "jail":
+                    jail_channel = channel
+                    break
 
-            jail_channel = await ctx.guild.create_text_channel(
-                name="jail",
-                overwrites=overwrites,
-                reason=f"Jail channel created for {member.name}"
-            )
+        if jail_channel is None:
+            # Create jail channel in koala setup category if it exists
+            if koala_category:
+                overwrites = {
+                    ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+                    ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True),
+                    member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+                }
+
+                jail_channel = await ctx.guild.create_text_channel(
+                    name="jail",
+                    category=koala_category,
+                    overwrites=overwrites,
+                    reason=f"Jail channel created for {member.name}"
+                )
+            else:
+                # Fallback: create jail channel without category
+                overwrites = {
+                    ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+                    ctx.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True),
+                    member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+                }
+
+                jail_channel = await ctx.guild.create_text_channel(
+                    name="jail",
+                    overwrites=overwrites,
+                    reason=f"Jail channel created for {member.name}"
+                )
 
         # Store original roles
         original_roles = [role.id for role in member.roles if role != ctx.guild.default_role]
@@ -453,12 +486,22 @@ async def unjail(ctx, member: discord.Member = None, *, reason=None):
 
         await ctx.send(embed=embed)
 
-        # Find jail channel and send release message
+        # Find jail channel in "koala setup" category
         jail_channel = None
-        for channel in ctx.guild.channels:
-            if channel.name == "jail":
-                jail_channel = channel
+        koala_category = None
+
+        # Find the koala setup category
+        for category in ctx.guild.categories:
+            if category.name == "koala setup":
+                koala_category = category
                 break
+
+        if koala_category:
+            # Look for jail channel in the koala setup category
+            for channel in koala_category.channels:
+                if channel.name == "jail":
+                    jail_channel = channel
+                    break
 
         if jail_channel:
             release_embed = discord.Embed(
