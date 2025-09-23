@@ -62,110 +62,35 @@ last_help_execution = {}
 
 @bot.command(name='help')
 async def help_command(ctx):
-    """Show available commands"""
-    user_id = ctx.author.id
-    current_time = datetime.now()
+    """Interactive help with categories and buttons"""
+    embed = discord.Embed(
+        title="🤖 Comandos del Bot",
+        description="¡Bienvenido al sistema de ayuda interactivo!\n\n"
+                   "Usa los botones para navegar por las diferentes categorías de comandos.\n"
+                   "Cada categoría contiene comandos relacionados agrupados por funcionalidad.",
+        color=0x0099ff
+    )
 
-    # Check if user recently executed help command (5 second cooldown)
-    if user_id in last_help_execution:
-        time_diff = (current_time - last_help_execution[user_id]).total_seconds()
-        if time_diff < 5:
-            print(f"[DEBUG] Help command blocked - too recent for user {ctx.author.name}")
-            return
+    embed.add_field(
+        name="📊 Estadísticas",
+        value=f"**Categorías:** 6\n"
+              f"**Comandos totales:** 30+\n"
+              f"**Última actualización:** {datetime.now().strftime('%d/%m/%Y')}",
+        inline=False
+    )
 
-    # Update last execution time
-    last_help_execution[user_id] = current_time
+    embed.add_field(
+        name="💡 Consejos",
+        value="• Usa `!help` para ver todos los comandos en una lista\n"
+              "• Usa `!commands` para una lista simple de comandos\n"
+              "• Cada comando debe empezar con `!`",
+        inline=False
+    )
 
-    print(f"[DEBUG] Help command executed by {ctx.author.name} at {current_time}")
+    embed.set_footer(text="Este menú se cerrará automáticamente en 5 minutos")
 
-    try:
-        # Create embed with all command information
-        embed = discord.Embed(
-            title="🤖 Bot Commands",
-            description="Here are all available commands:",
-            color=0x0099ff
-        )
-
-        # Moderation commands
-        embed.add_field(
-            name="🛠️ Moderation",
-            value="`!purge <amount>` - Delete messages\n"
-                  "`!kick <user> [reason]` - Kick a user\n"
-                  "`!ban <user> [reason]` - Ban a user\n"
-                  "`!unban <user_id>` - Unban a user",
-            inline=False
-        )
-
-        # User commands
-        embed.add_field(
-            name="👤 User Commands",
-            value="`!avatar [@user]` - Get user avatar\n"
-                  "`!userinfo [@user]` - Get user information\n"
-                  "`!banner [@user]` - Get user banner\n"
-                  "`!serverinfo` - Get server information",
-            inline=False
-        )
-
-        # Fun commands
-        embed.add_field(
-            name="🎲 Fun Commands",
-            value="`!roll <dice>` - Roll dice (e.g., 1d20)\n"
-                  "`!coinflip` - Flip a coin",
-            inline=False
-        )
-
-        # Utility commands
-        embed.add_field(
-            name="🔧 Utility",
-            value="`!say <message>` - Make bot say something\n"
-                  "`!ping` - Check bot latency\n"
-                  "`!help` - Show this message\n"
-                  "`!commands` - Show all commands in a list",
-            inline=False
-        )
-
-        # Additional moderation commands
-        embed.add_field(
-            name="⚠️ Moderation+",
-            value="`!warn <user> [reason]` - Warn a user\n"
-                  "`!poll <question>` - Create a poll\n"
-                  "`!remind <minutes> <message>` - Set a reminder",
-            inline=False
-        )
-
-        # Community commands
-        embed.add_field(
-            name="🎯 Community",
-            value="`!weather <city>` - Get weather info\n"
-                  "`!joke` - Get a random joke\n"
-                  "`!fact` - Get a random fact\n"
-                  "`!meme` - Get a programmer meme",
-            inline=False
-        )
-
-        # Information commands
-        embed.add_field(
-            name="📊 Information",
-            value="`!roleinfo <role>` - Get role information\n"
-                  "`!channelinfo [channel]` - Get channel info\n"
-                  "`!serverstats` - Detailed server statistics\n"
-                  "`!calc <expression>` - Simple calculator",
-            inline=False
-        )
-
-        embed.set_footer(text="Use ! before each command")
-
-        print(f"[DEBUG] About to send help embed at {datetime.now()}")
-        # Send the embed once and store the message
-        message = await ctx.send(embed=embed)
-        print(f"[DEBUG] Help embed sent successfully at {datetime.now()}, message ID: {message.id}")
-
-        # Add reactions to the message for better interaction
-        await message.add_reaction("✅")
-
-    except Exception as e:
-        print(f"[ERROR] Failed to send help embed: {e}")
-        await ctx.send("❌ Sorry, there was an error displaying the help message.")
+    view = HelpView(ctx)
+    await ctx.send(embed=embed, view=view)
 
 # Interactive Help Command with Categories
 class HelpView(View):
