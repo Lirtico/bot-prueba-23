@@ -142,6 +142,9 @@ async def setup_koala_system(interaction: discord.Interaction):
         )
         return
 
+    # Defer the response to prevent timeout
+    await interaction.response.defer(ephemeral=True)
+
     try:
         # Create the koala setup category
         category = await interaction.guild.create_category(
@@ -227,7 +230,7 @@ async def setup_koala_system(interaction: discord.Interaction):
 
         embed.set_footer(text="Use /logs-disable to stop logging")
 
-        await interaction.response.send_message(embed=embed, ephemeral=True)
+        await interaction.followup.send(embed=embed, ephemeral=True)
 
         # Send a test message to the log channel
         test_embed = discord.Embed(
@@ -256,12 +259,12 @@ async def setup_koala_system(interaction: discord.Interaction):
         await jail_channel.send(embed=jail_embed)
 
     except discord.Forbidden:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             "❌ I don't have permission to create channels or categories in this server.",
             ephemeral=True
         )
     except discord.HTTPException as e:
-        await interaction.response.send_message(
+        await interaction.followup.send(
             f"❌ Failed to create koala setup: {e}",
             ephemeral=True
         )
