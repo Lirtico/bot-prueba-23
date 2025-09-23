@@ -380,6 +380,16 @@ async def on_ready():
     print(f'Connected to {len(bot.guilds)} servers')
     print('------')
 
+    # Sync slash commands with Discord
+    try:
+        synced = await bot.tree.sync()
+        print(f'Synced {len(synced)} command(s)')
+        print('Available commands:')
+        for command in bot.tree.get_commands():
+            print(f'  - /{command.name}: {command.description}')
+    except Exception as e:
+        print(f'Failed to sync commands: {e}')
+
 @bot.event
 async def on_command(ctx):
     """Log when commands are executed"""
