@@ -173,7 +173,8 @@ async def setup_koala_system(interaction: discord.Interaction):
         # Create the jail channel
         jail_overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
-            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True)
+            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True),
+            jailed_role: discord.PermissionOverwrite(read_messages=True, send_messages=True, view_channel=True)
         }
 
         jail_channel = await interaction.guild.create_text_channel(
@@ -182,6 +183,12 @@ async def setup_koala_system(interaction: discord.Interaction):
             overwrites=jail_overwrites,
             reason="Auto-created by setup command"
         )
+
+        # Set up permissions for existing channels to hide them from jailed users
+        for channel in interaction.guild.channels:
+            if channel != jail_channel and channel != category:
+                # Deny view permissions for jailed role on all existing channels
+                await channel.set_permissions(jailed_role, view_channel=False, read_messages=False, send_messages=False)
 
         # Configure logging to use the logs channel
         log_channels[guild_id] = logs_channel.id
