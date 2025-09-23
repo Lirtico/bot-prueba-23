@@ -448,10 +448,9 @@ async def banner(ctx, member: discord.Member = None):
                 embed.add_field(name="User ID", value=member.id, inline=True)
                 embed.add_field(name="Status", value="✅ Has Banner", inline=True)
             else:
-                embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
-                embed.add_field(name="User", value=member.mention, inline=True)
-                embed.add_field(name="User ID", value=member.id, inline=True)
-                embed.add_field(name="Status", value="❌ No Banner", inline=True)
+                # User doesn't have a banner, send simple message instead of embed
+                await ctx.send(f"❌ {member.mention} doesn't have a banner set.")
+                return
         else:
             # If API call fails, show default image
             embed.set_image(url="https://i.imgur.com/3YcB3iV.png")  # Default banner image
