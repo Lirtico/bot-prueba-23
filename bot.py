@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ui import Button, View, Select
 import os
 import random
 import asyncio
@@ -165,6 +166,190 @@ async def help_command(ctx):
     except Exception as e:
         print(f"[ERROR] Failed to send help embed: {e}")
         await ctx.send("❌ Sorry, there was an error displaying the help message.")
+
+# Interactive Help Command with Categories
+class HelpView(View):
+    def __init__(self, ctx):
+        super().__init__(timeout=300)  # 5 minutes timeout
+        self.ctx = ctx
+        self.current_category = None
+
+    async def interaction_check(self, interaction):
+        return interaction.user == self.ctx.author
+
+    @discord.ui.button(label="📋 Categorías", style=discord.ButtonStyle.primary, emoji="📋")
+    async def show_categories(self, interaction, button):
+        embed = discord.Embed(
+            title="📋 Lista de categorías",
+            description="Selecciona una categoría para ver sus comandos:",
+            color=0x0099ff
+        )
+
+        # Create select menu for categories
+        select = Select(
+            placeholder="Elige una categoría...",
+            options=[
+                discord.SelectOption(label="🛠️ Moderación", value="moderation", description="Comandos para moderar el servidor", emoji="🛠️"),
+                discord.SelectOption(label="👤 Usuario", value="user", description="Comandos relacionados con usuarios", emoji="👤"),
+                discord.SelectOption(label="🎲 Diversión", value="fun", description="Comandos de entretenimiento", emoji="🎲"),
+                discord.SelectOption(label="🔧 Utilidad", value="utility", description="Comandos útiles y herramientas", emoji="🔧"),
+                discord.SelectOption(label="🎯 Comunidad", value="community", description="Comandos para la comunidad", emoji="🎯"),
+                discord.SelectOption(label="📊 Información", value="info", description="Comandos de información", emoji="📊"),
+            ]
+        )
+
+        view = CategorySelectView(self.ctx, select)
+        select.callback = view.category_select_callback
+
+        embed.set_footer(text="Usa el menú desplegable para seleccionar una categoría")
+        await interaction.response.edit_message(embed=embed, view=view)
+
+    @discord.ui.button(label="❌ Cerrar", style=discord.ButtonStyle.danger, emoji="❌")
+    async def close_help(self, interaction, button):
+        await interaction.response.edit_message(content="❌ Ayuda cerrada.", embed=None, view=None)
+
+class CategorySelectView(View):
+    def __init__(self, ctx, select_component):
+        super().__init__(timeout=300)
+        self.ctx = ctx
+        self.add_item(select_component)
+
+    async def category_select_callback(self, interaction):
+        selected_category = interaction.data['values'][0]
+
+        # Command categories
+        categories = {
+            "moderation": {
+                "name": "🛠️ Moderación",
+                "description": "Comandos para moderar el servidor",
+                "commands": {
+                    "`!purge <cantidad>`": "Eliminar mensajes",
+                    "`!kick <usuario> [razón]`": "Expulsar a un usuario",
+                    "`!ban <usuario> [razón]`": "Banear a un usuario",
+                    "`!unban <user_id>`": "Desbanear a un usuario",
+                    "`!warn <usuario> [razón]`": "Advertir a un usuario"
+                },
+                "color": 0xff0000
+            },
+            "user": {
+                "name": "👤 Usuario",
+                "description": "Comandos relacionados con usuarios",
+                "commands": {
+                    "`!avatar [@usuario]`": "Obtener el avatar de un usuario",
+                    "`!userinfo [@usuario]`": "Obtener información de un usuario",
+                    "`!banner [@usuario]`": "Obtener el banner de un usuario"
+                },
+                "color": 0x0099ff
+            },
+            "fun": {
+                "name": "🎲 Diversión",
+                "description": "Comandos de entretenimiento",
+                "commands": {
+                    "`!roll <dados>`": "Tirar dados (ej: 1d20)",
+                    "`!coinflip`": "Lanzar una moneda",
+                    "`!joke`": "Obtener un chiste aleatorio",
+                    "`!fact`": "Obtener un dato curioso",
+                    "`!meme`": "Obtener un meme de programador"
+                },
+                "color": 0xff9900
+            },
+            "utility": {
+                "name": "🔧 Utilidad",
+                "description": "Comandos útiles y herramientas",
+                "commands": {
+                    "`!say <mensaje>`": "Hacer que el bot diga algo",
+                    "`!ping`": "Verificar la latencia del bot",
+                    "`!help`": "Mostrar esta ayuda",
+                    "`!commands`": "Lista simple de comandos"
+                },
+                "color": 0x00ff00
+            },
+            "community": {
+                "name": "🎯 Comunidad",
+                "description": "Comandos para la comunidad",
+                "commands": {
+                    "`!poll <pregunta>`": "Crear una encuesta",
+                    "`!remind <minutos> <mensaje>`": "Establecer un recordatorio",
+                    "`!weather <ciudad>`": "Obtener información del clima",
+                    "`!calc <expresión>`": "Calculadora simple",
+                    "`!urban <término>`": "Buscar en Urban Dictionary"
+                },
+                "color": 0xff69b4
+            },
+            "info": {
+                "name": "📊 Información",
+                "description": "Comandos de información",
+                "commands": {
+                    "`!serverinfo`": "Obtener información del servidor",
+                    "`!serverstats`": "Estadísticas detalladas del servidor",
+                    "`!roleinfo <rol>`": "Obtener información de un rol",
+                    "`!channelinfo [canal]`": "Obtener información de un canal"
+                },
+                "color": 0x9932cc
+            }
+        }
+
+        category = categories[selected_category]
+        embed = discord.Embed(
+            title=category["name"],
+            description=category["description"],
+            color=category["color"]
+        )
+
+        # Add commands to embed
+        for command, description in category["commands"].items():
+            embed.add_field(name=command, value=description, inline=False)
+
+        embed.set_footer(text=f"Total de comandos: {len(category['commands'])} | Usa ! antes de cada comando")
+
+        # Create back button
+        view = View()
+        back_button = Button(label="⬅️ Volver", style=discord.ButtonStyle.secondary, emoji="⬅️")
+        async def back_callback(interaction):
+            embed = discord.Embed(
+                title="📋 Lista de categorías",
+                description="Selecciona una categoría para ver sus comandos:",
+                color=0x0099ff
+            )
+            embed.set_footer(text="Usa el menú desplegable para seleccionar una categoría")
+            await interaction.response.edit_message(embed=embed, view=HelpView(self.ctx))
+
+        back_button.callback = back_callback
+        view.add_item(back_button)
+
+        await interaction.response.edit_message(embed=embed, view=view)
+
+@bot.command(name='help_interactive')
+async def help_interactive(ctx):
+    """Interactive help with categories and buttons"""
+    embed = discord.Embed(
+        title="🤖 Comandos del Bot",
+        description="¡Bienvenido al sistema de ayuda interactivo!\n\n"
+                   "Usa los botones para navegar por las diferentes categorías de comandos.\n"
+                   "Cada categoría contiene comandos relacionados agrupados por funcionalidad.",
+        color=0x0099ff
+    )
+
+    embed.add_field(
+        name="📊 Estadísticas",
+        value=f"**Categorías:** 6\n"
+              f"**Comandos totales:** 30+\n"
+              f"**Última actualización:** {datetime.now().strftime('%d/%m/%Y')}",
+        inline=False
+    )
+
+    embed.add_field(
+        name="💡 Consejos",
+        value="• Usa `!help` para ver todos los comandos en una lista\n"
+              "• Usa `!commands` para una lista simple de comandos\n"
+              "• Cada comando debe empezar con `!`",
+        inline=False
+    )
+
+    embed.set_footer(text="Este menú se cerrará automáticamente en 5 minutos")
+
+    view = HelpView(ctx)
+    await ctx.send(embed=embed, view=view)
 
 @bot.command(name='commands')
 async def commands_list(ctx):
