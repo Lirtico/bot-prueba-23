@@ -439,12 +439,11 @@ async def banner(ctx, member: discord.Member = None):
             # Check if user has a banner
             if user_data.get('banner'):
                 banner_hash = user_data['banner']
-                # Try GIF first (animated banner), then PNG (static banner)
-                banner_gif_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.gif?size=1024"
-                banner_png_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.png?size=1024"
+                # Construct banner URL without size parameter first
+                banner_url = f"https://cdn.discordapp.com/banners/{member.id}/{banner_hash}.png"
 
-                # Try to use the banner (Discord will redirect to the correct format)
-                embed.set_image(url=banner_gif_url)
+                # Set the banner image
+                embed.set_image(url=banner_url)
                 embed.add_field(name="User", value=member.mention, inline=True)
                 embed.add_field(name="User ID", value=member.id, inline=True)
                 embed.add_field(name="Status", value="✅ Has Banner", inline=True)
