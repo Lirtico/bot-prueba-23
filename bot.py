@@ -533,40 +533,8 @@ async def unjail(ctx, member: discord.Member = None, *, reason=None):
 
         await ctx.send(embed=embed)
 
-        # Find jail channel in "koala setup" category
-        jail_channel = None
-        koala_category = None
-
-        # Find the koala setup category
-        for category in ctx.guild.categories:
-            if category.name == "koala setup":
-                koala_category = category
-                break
-
-        if koala_category:
-            # Look for jail channel in the koala setup category
-            for channel in koala_category.channels:
-                if channel.name == "jail":
-                    jail_channel = channel
-                    break
-
-        if jail_channel:
-            release_embed = discord.Embed(
-                title="🔓 Released from Jail",
-                description=f"{member.mention}, you have been released from jail!",
-                color=0x00ff00
-            )
-
-            if reason:
-                release_embed.add_field(name="Reason", value=reason, inline=False)
-
-            release_embed.add_field(name="Released by", value=ctx.author.mention, inline=True)
-            release_embed.add_field(name="Time Served", value=f"{(datetime.now().timestamp() - jail_info['timestamp']) / 3600:.1f} hours", inline=True)
-
-            try:
-                await jail_channel.send(embed=release_embed)
-            except discord.Forbidden:
-                pass
+        # Note: Removed the second embed that was being sent to the jail channel
+        # to avoid duplicate notifications
 
         # Log the unjail action if logging is enabled
         if guild_id in log_channels:
