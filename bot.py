@@ -359,6 +359,26 @@ async def jail(ctx, member: discord.Member = None, *, reason=None):
                     await ctx.send(f"❌ Failed to remove roles: {e}")
                     return
 
+        # Find and assign the "jailed" role
+        jailed_role = None
+        for role in ctx.guild.roles:
+            if role.name == "jailed":
+                jailed_role = role
+                break
+
+        if jailed_role:
+            try:
+                await member.add_roles(jailed_role, reason=f"User jailed by {ctx.author.name}")
+            except discord.Forbidden:
+                await ctx.send("❌ I don't have permission to assign the jailed role.")
+                return
+            except discord.HTTPException as e:
+                await ctx.send(f"❌ Failed to assign jailed role: {e}")
+                return
+        else:
+            await ctx.send("❌ Could not find the 'jailed' role. Please run the setup command first.")
+            return
+
         # Store jail data
         if guild_id not in jail_data:
             jail_data[guild_id] = {}
