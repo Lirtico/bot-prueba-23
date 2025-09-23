@@ -127,10 +127,10 @@ async def logs_status(interaction: discord.Interaction):
 
     await interaction.response.send_message(embed=embed, ephemeral=True)
 
-@bot.tree.command(name="setup-logs", description="Create logs-server channel and configure logging")
+@bot.tree.command(name="setup", description="Create koala setup category with logs-server and jail channels")
 @commands.has_permissions(administrator=True)
-async def setup_logs_auto(interaction: discord.Interaction):
-    """Create a logs-server channel and set up logging automatically"""
+async def setup_koala_system(interaction: discord.Interaction):
+    """Create a koala setup category with logs-server and jail channels"""
     guild_id = interaction.guild.id
 
     # Check if logging is already configured
@@ -143,42 +143,70 @@ async def setup_logs_auto(interaction: discord.Interaction):
         return
 
     try:
+        # Create the koala setup category
+        category = await interaction.guild.create_category(
+            name="koala setup",
+            reason="Auto-created by setup command"
+        )
+
         # Create the logs-server channel
-        overwrites = {
+        logs_overwrites = {
             interaction.guild.default_role: discord.PermissionOverwrite(read_messages=True, send_messages=False),
             interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True)
         }
 
         logs_channel = await interaction.guild.create_text_channel(
             name="logs-server",
-            overwrites=overwrites,
-            reason="Auto-created by setup-logs command"
+            category=category,
+            overwrites=logs_overwrites,
+            reason="Auto-created by setup command"
         )
 
-        # Configure logging to use this channel
+        # Create the jail channel
+        jail_overwrites = {
+            interaction.guild.default_role: discord.PermissionOverwrite(read_messages=False, send_messages=False),
+            interaction.guild.me: discord.PermissionOverwrite(read_messages=True, send_messages=True, manage_messages=True, manage_channels=True)
+        }
+
+        jail_channel = await interaction.guild.create_text_channel(
+            name="jail",
+            category=category,
+            overwrites=jail_overwrites,
+            reason="Auto-created by setup command"
+        )
+
+        # Configure logging to use the logs channel
         log_channels[guild_id] = logs_channel.id
 
         embed = discord.Embed(
-            title="📋 Logging System Setup Complete",
-            description=f"✅ Created {logs_channel.mention} and configured server logging!",
+            title="🐨 Koala Setup Complete",
+            description=f"✅ Created **koala setup** category with {logs_channel.mention} and {jail_channel.mention}!",
             color=0x00ff00
         )
 
         embed.add_field(
-            name="📊 Events Logged",
-            value="• Member joins/leaves\n"
+            name="📊 Logs Channel",
+            value="• Server events logging\n"
+                  "• Member joins/leaves\n"
                   "• Messages deleted\n"
                   "• Role changes\n"
-                  "• Channel updates\n"
                   "• Moderation actions",
             inline=False
         )
 
         embed.add_field(
+            name="🔒 Jail Channel",
+            value="• Isolated moderation space\n"
+                  "• Jailed users can communicate\n"
+                  "• Only bot can manage messages",
+            inline=False
+        )
+
+        embed.add_field(
             name="🔧 Channel Permissions",
-            value="• Everyone can read messages\n"
-                  "• Only bot can send messages\n"
-                  "• Bot can manage messages",
+            value="• **Logs:** Everyone can read, only bot can send\n"
+                  "• **Jail:** Hidden from everyone except jailed users and bot\n"
+                  "• **Category:** Organized under 'koala setup'",
             inline=False
         )
 
@@ -188,25 +216,38 @@ async def setup_logs_auto(interaction: discord.Interaction):
 
         # Send a test message to the log channel
         test_embed = discord.Embed(
-            title="🔧 Logging System Activated",
-            description="Server logging has been configured and is now active.",
+            title="🔧 Koala System Activated",
+            description="Koala setup category has been created and logging is now active.",
             color=0x0099ff
         )
         test_embed.add_field(name="📝 Log Channel", value=logs_channel.mention, inline=True)
+        test_embed.add_field(name="🔒 Jail Channel", value=jail_channel.mention, inline=True)
         test_embed.add_field(name="⚙️ Configured by", value=interaction.user.mention, inline=True)
-        test_embed.add_field(name="🚀 Setup Method", value="Auto-created channel", inline=True)
+        test_embed.add_field(name="📁 Category", value="koala setup", inline=True)
         test_embed.set_footer(text=f"Server: {interaction.guild.name}")
 
         await logs_channel.send(embed=test_embed)
 
+        # Send welcome message to jail channel
+        jail_embed = discord.Embed(
+            title="🔒 Koala Jail System",
+            description="This is the jail channel for moderated users.\n\n"
+                       "Users sent here can communicate with each other and moderators.\n"
+                       "Contact a moderator if you believe this is a mistake.",
+            color=0xff0000
+        )
+        jail_embed.set_footer(text="Koala Jail System - Part of koala setup category")
+
+        await jail_channel.send(embed=jail_embed)
+
     except discord.Forbidden:
         await interaction.response.send_message(
-            "❌ I don't have permission to create channels in this server.",
+            "❌ I don't have permission to create channels or categories in this server.",
             ephemeral=True
         )
     except discord.HTTPException as e:
         await interaction.response.send_message(
-            f"❌ Failed to create logs channel: {e}",
+            f"❌ Failed to create koala setup: {e}",
             ephemeral=True
         )
 
