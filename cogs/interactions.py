@@ -8,7 +8,7 @@ class InteractionsCog(commands.Cog):
         self.bot = bot
 
     @commands.command(name='slap')
-    async def slap(self, ctx, member: discord.Member = None):
+    async def slap(self, ctx, member: discord.Member):
         """Slap a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes abofetearte a ti mismo!")
@@ -18,20 +18,12 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime slap")
             print(f"DEBUG: Slap GIF URL: {gif_url}")  # Debug line
 
-            if member is None:
-                embed = discord.Embed(
-                    title="👋 Bofetada!",
-                    description=f"{ctx.author.mention} se dio una bofetada a sí mismo!",
-                    color=0xff6b6b
-                )
-                embed.set_footer(text="¡Ay! Eso tuvo que doler!")
-            else:
-                embed = discord.Embed(
-                    title="👋 Bofetada!",
-                    description=f"{ctx.author.mention} le dio una bofetada a {member.mention}!",
-                    color=0xff6b6b
-                )
-                embed.set_footer(text="¡Ay! Eso tuvo que doler!")
+            embed = discord.Embed(
+                title="👋 Bofetada!",
+                description=f"{ctx.author.mention} le dio una bofetada a {member.mention}!",
+                color=0xff6b6b
+            )
+            embed.set_footer(text="¡Ay! Eso tuvo que doler!")
 
             embed.set_image(url=gif_url)
             await ctx.send(embed=embed)
@@ -39,16 +31,13 @@ class InteractionsCog(commands.Cog):
             print(f"Error in slap command: {e}")
             try:
                 # Fallback: send just the text and URL
-                if member is None:
-                    await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} se dio una bofetada a sí mismo!\n¡Ay! Eso tuvo que doler!\n*(Error al cargar el GIF)*")
-                else:
-                    await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} le dio una bofetada a {member.mention}!\n¡Ay! Eso tuvo que doler!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} le dio una bofetada a {member.mention}!\n¡Ay! Eso tuvo que doler!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in slap: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='hug')
-    async def hug(self, ctx, member: discord.Member = None):
+    async def hug(self, ctx, member: discord.Member):
         """Hug a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes abrazarte a ti mismo!")
@@ -57,20 +46,12 @@ class InteractionsCog(commands.Cog):
         gif_url = gif_api.get_gif_url("anime hug")
         print(f"DEBUG: Hug GIF URL: {gif_url}")  # Debug line
 
-        if member is None:
-            embed = discord.Embed(
-                title="🤗 Abrazo!",
-                description=f"{ctx.author.mention} se está abrazando a sí mismo!",
-                color=0xffb3ba
-            )
-            embed.set_footer(text="¡Aww, qué lindo!")
-        else:
-            embed = discord.Embed(
-                title="🤗 Abrazo!",
-                description=f"{ctx.author.mention} abrazó a {member.mention}!",
-                color=0xffb3ba
-            )
-            embed.set_footer(text="¡Aww, qué lindo!")
+        embed = discord.Embed(
+            title="🤗 Abrazo!",
+            description=f"{ctx.author.mention} abrazó a {member.mention}!",
+            color=0xffb3ba
+        )
+        embed.set_footer(text="¡Aww, qué lindo!")
 
         embed.set_image(url=gif_url)
 
@@ -79,13 +60,10 @@ class InteractionsCog(commands.Cog):
         except Exception as e:
             print(f"Error sending hug embed: {e}")
             # Fallback: send just the text and URL
-            if member is None:
-                await ctx.send(f"🤗 **Abrazo!** {ctx.author.mention} se está abrazando a sí mismo!\n¡Aww, qué lindo!\n{gif_url}")
-            else:
-                await ctx.send(f"🤗 **Abrazo!** {ctx.author.mention} abrazó a {member.mention}!\n¡Aww, qué lindo!\n{gif_url}")
+            await ctx.send(f"🤗 **Abrazo!** {ctx.author.mention} abrazó a {member.mention}!\n¡Aww, qué lindo!\n{gif_url}")
 
     @commands.command(name='kiss')
-    async def kiss(self, ctx, member: discord.Member = None):
+    async def kiss(self, ctx, member: discord.Member):
         """Kiss a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes besarte a ti mismo!")
@@ -94,20 +72,12 @@ class InteractionsCog(commands.Cog):
         gif_url = gif_api.get_gif_url("anime kiss")
         print(f"DEBUG: Kiss GIF URL: {gif_url}")  # Debug line
 
-        if member is None:
-            embed = discord.Embed(
-                title="💋 Beso!",
-                description=f"{ctx.author.mention} se está besando a sí mismo!",
-                color=0xff69b4
-            )
-            embed.set_footer(text="¡Qué romántico!")
-        else:
-            embed = discord.Embed(
-                title="💋 Beso!",
-                description=f"{ctx.author.mention} besó a {member.mention}!",
-                color=0xff69b4
-            )
-            embed.set_footer(text="¡Qué romántico!")
+        embed = discord.Embed(
+            title="💋 Beso!",
+            description=f"{ctx.author.mention} besó a {member.mention}!",
+            color=0xff69b4
+        )
+        embed.set_footer(text="¡Qué romántico!")
 
         embed.set_image(url=gif_url)
 
@@ -116,13 +86,10 @@ class InteractionsCog(commands.Cog):
         except Exception as e:
             print(f"Error sending kiss embed: {e}")
             # Fallback: send just the text and URL
-            if member is None:
-                await ctx.send(f"💋 **Beso!** {ctx.author.mention} se está besando a sí mismo!\n¡Qué romántico!\n{gif_url}")
-            else:
-                await ctx.send(f"💋 **Beso!** {ctx.author.mention} besó a {member.mention}!\n¡Qué romántico!\n{gif_url}")
+            await ctx.send(f"💋 **Beso!** {ctx.author.mention} besó a {member.mention}!\n¡Qué romántico!\n{gif_url}")
 
     @commands.command(name='pat')
-    async def pat(self, ctx, member: discord.Member = None):
+    async def pat(self, ctx, member: discord.Member):
         """Pat a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes acariciarte a ti mismo!")
@@ -131,20 +98,12 @@ class InteractionsCog(commands.Cog):
         gif_url = gif_api.get_gif_url("anime pat")
         print(f"DEBUG: Pat GIF URL: {gif_url}")  # Debug line
 
-        if member is None:
-            embed = discord.Embed(
-                title="👋 Caricia!",
-                description=f"{ctx.author.mention} se está acariciando a sí mismo!",
-                color=0x98d8c8
-            )
-            embed.set_footer(text="¡Buen trabajo!")
-        else:
-            embed = discord.Embed(
-                title="👋 Caricia!",
-                description=f"{ctx.author.mention} acarició a {member.mention}!",
-                color=0x98d8c8
-            )
-            embed.set_footer(text="¡Buen trabajo!")
+        embed = discord.Embed(
+            title="👋 Caricia!",
+            description=f"{ctx.author.mention} acarició a {member.mention}!",
+            color=0x98d8c8
+        )
+        embed.set_footer(text="¡Buen trabajo!")
 
         embed.set_image(url=gif_url)
 
@@ -153,13 +112,10 @@ class InteractionsCog(commands.Cog):
         except Exception as e:
             print(f"Error sending pat embed: {e}")
             # Fallback: send just the text and URL
-            if member is None:
-                await ctx.send(f"👋 **Caricia!** {ctx.author.mention} se está acariciando a sí mismo!\n¡Buen trabajo!\n{gif_url}")
-            else:
-                await ctx.send(f"👋 **Caricia!** {ctx.author.mention} acarició a {member.mention}!\n¡Buen trabajo!\n{gif_url}")
+            await ctx.send(f"👋 **Caricia!** {ctx.author.mention} acarició a {member.mention}!\n¡Buen trabajo!\n{gif_url}")
 
     @commands.command(name='tickle')
-    async def tickle(self, ctx, member: discord.Member = None):
+    async def tickle(self, ctx, member: discord.Member):
         """Tickle a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes hacerte cosquillas a ti mismo!")
@@ -169,20 +125,12 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime tickle")
             print(f"DEBUG: Tickle GIF URL: {gif_url}")  # Debug line
 
-            if member is None:
-                embed = discord.Embed(
-                    title="😂 Cosquillas!",
-                    description=f"{ctx.author.mention} se está haciendo cosquillas a sí mismo!",
-                    color=0xf7dc6f
-                )
-                embed.set_footer(text="¡Para! ¡Me muero de risa!")
-            else:
-                embed = discord.Embed(
-                    title="😂 Cosquillas!",
-                    description=f"{ctx.author.mention} le hizo cosquillas a {member.mention}!",
-                    color=0xf7dc6f
-                )
-                embed.set_footer(text="¡Para! ¡Me muero de risa!")
+            embed = discord.Embed(
+                title="😂 Cosquillas!",
+                description=f"{ctx.author.mention} le hizo cosquillas a {member.mention}!",
+                color=0xf7dc6f
+            )
+            embed.set_footer(text="¡Para! ¡Me muero de risa!")
 
             embed.set_image(url=gif_url)
             await ctx.send(embed=embed)
@@ -190,16 +138,13 @@ class InteractionsCog(commands.Cog):
             print(f"Error in tickle command: {e}")
             try:
                 # Fallback: send just the text and URL
-                if member is None:
-                    await ctx.send(f"😂 **Cosquillas!** {ctx.author.mention} se está haciendo cosquillas a sí mismo!\n¡Para! ¡Me muero de risa!\n*(Error al cargar el GIF)*")
-                else:
-                    await ctx.send(f"😂 **Cosquillas!** {ctx.author.mention} le hizo cosquillas a {member.mention}!\n¡Para! ¡Me muero de risa!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"😂 **Cosquillas!** {ctx.author.mention} le hizo cosquillas a {member.mention}!\n¡Para! ¡Me muero de risa!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in tickle: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='feed')
-    async def feed(self, ctx, member: discord.Member = None):
+    async def feed(self, ctx, member: discord.Member):
         """Feed a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes alimentarte a ti mismo!")
@@ -209,20 +154,12 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime feed")
             print(f"DEBUG: Feed GIF URL: {gif_url}")  # Debug line
 
-            if member is None:
-                embed = discord.Embed(
-                    title="🍜 Alimentar!",
-                    description=f"{ctx.author.mention} está comiendo!",
-                    color=0xf8c471
-                )
-                embed.set_footer(text="¡Ñam ñam!")
-            else:
-                embed = discord.Embed(
-                    title="🍜 Alimentar!",
-                    description=f"{ctx.author.mention} alimentó a {member.mention}!",
-                    color=0xf8c471
-                )
-                embed.set_footer(text="¡Ñam ñam!")
+            embed = discord.Embed(
+                title="🍜 Alimentar!",
+                description=f"{ctx.author.mention} alimentó a {member.mention}!",
+                color=0xf8c471
+            )
+            embed.set_footer(text="¡Ñam ñam!")
 
             embed.set_image(url=gif_url)
             await ctx.send(embed=embed)
@@ -230,16 +167,13 @@ class InteractionsCog(commands.Cog):
             print(f"Error in feed command: {e}")
             try:
                 # Fallback: send just the text and URL
-                if member is None:
-                    await ctx.send(f"🍜 **Alimentar!** {ctx.author.mention} está comiendo!\n¡Ñam ñam!\n*(Error al cargar el GIF)*")
-                else:
-                    await ctx.send(f"🍜 **Alimentar!** {ctx.author.mention} alimentó a {member.mention}!\n¡Ñam ñam!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"🍜 **Alimentar!** {ctx.author.mention} alimentó a {member.mention}!\n¡Ñam ñam!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in feed: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='punch')
-    async def punch(self, ctx, member: discord.Member = None):
+    async def punch(self, ctx, member: discord.Member):
         """Punch a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes golpearte a ti mismo!")
@@ -249,20 +183,12 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime punch")
             print(f"DEBUG: Punch GIF URL: {gif_url}")  # Debug line
 
-            if member is None:
-                embed = discord.Embed(
-                    title="👊 Golpe!",
-                    description=f"{ctx.author.mention} se golpeó a sí mismo!",
-                    color=0xe74c3c
-                )
-                embed.set_footer(text="¡Uff! Eso dolió!")
-            else:
-                embed = discord.Embed(
-                    title="👊 Golpe!",
-                    description=f"{ctx.author.mention} golpeó a {member.mention}!",
-                    color=0xe74c3c
-                )
-                embed.set_footer(text="¡Uff! Eso dolió!")
+            embed = discord.Embed(
+                title="👊 Golpe!",
+                description=f"{ctx.author.mention} golpeó a {member.mention}!",
+                color=0xe74c3c
+            )
+            embed.set_footer(text="¡Uff! Eso dolió!")
 
             embed.set_image(url=gif_url)
             await ctx.send(embed=embed)
@@ -270,16 +196,13 @@ class InteractionsCog(commands.Cog):
             print(f"Error in punch command: {e}")
             try:
                 # Fallback: send just the text and URL
-                if member is None:
-                    await ctx.send(f"👊 **Golpe!** {ctx.author.mention} se golpeó a sí mismo!\n¡Uff! Eso dolió!\n*(Error al cargar el GIF)*")
-                else:
-                    await ctx.send(f"👊 **Golpe!** {ctx.author.mention} golpeó a {member.mention}!\n¡Uff! Eso dolió!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"👊 **Golpe!** {ctx.author.mention} golpeó a {member.mention}!\n¡Uff! Eso dolió!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in punch: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='highfive')
-    async def highfive(self, ctx, member: discord.Member = None):
+    async def highfive(self, ctx, member: discord.Member):
         """High five a user with an anime GIF"""
         if member == ctx.author:
             await ctx.send("❌ No puedes chocar los cinco contigo mismo!")
@@ -289,20 +212,12 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime high five")
             print(f"DEBUG: Highfive GIF URL: {gif_url}")  # Debug line
 
-            if member is None:
-                embed = discord.Embed(
-                    title="✋ Choca esos cinco!",
-                    description=f"{ctx.author.mention} está chocando los cinco solo!",
-                    color=0x85c1e9
-                )
-                embed.set_footer(text="¡Genial!")
-            else:
-                embed = discord.Embed(
-                    title="✋ Choca esos cinco!",
-                    description=f"{ctx.author.mention} chocó los cinco con {member.mention}!",
-                    color=0x85c1e9
-                )
-                embed.set_footer(text="¡Genial!")
+            embed = discord.Embed(
+                title="✋ Choca esos cinco!",
+                description=f"{ctx.author.mention} chocó los cinco con {member.mention}!",
+                color=0x85c1e9
+            )
+            embed.set_footer(text="¡Genial!")
 
             embed.set_image(url=gif_url)
             await ctx.send(embed=embed)
@@ -310,21 +225,14 @@ class InteractionsCog(commands.Cog):
             print(f"Error in highfive command: {e}")
             try:
                 # Fallback: send just the text and URL
-                if member is None:
-                    await ctx.send(f"✋ **Choca esos cinco!** {ctx.author.mention} está chocando los cinco solo!\n¡Genial!\n*(Error al cargar el GIF)*")
-                else:
-                    await ctx.send(f"✋ **Choca esos cinco!** {ctx.author.mention} chocó los cinco con {member.mention}!\n¡Genial!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"✋ **Choca esos cinco!** {ctx.author.mention} chocó los cinco con {member.mention}!\n¡Genial!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in highfive: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='bite')
-    async def bite(self, ctx, member: discord.Member = None):
+    async def bite(self, ctx, member: discord.Member):
         """Bite a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para morder!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes morderte a ti mismo!")
             return
@@ -352,12 +260,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='shoot')
-    async def shoot(self, ctx, member: discord.Member = None):
+    async def shoot(self, ctx, member: discord.Member):
         """Shoot a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para disparar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes dispararte a ti mismo!")
             return
@@ -385,12 +289,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='wave')
-    async def wave(self, ctx, member: discord.Member = None):
+    async def wave(self, ctx, member: discord.Member):
         """Wave at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para saludar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes saludarte a ti mismo!")
             return
@@ -418,12 +318,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='happy')
-    async def happy(self, ctx, member: discord.Member = None):
+    async def happy(self, ctx, member: discord.Member):
         """Show happiness to a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para estar feliz!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes estar feliz contigo mismo!")
             return
@@ -451,12 +347,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='peck')
-    async def peck(self, ctx, member: discord.Member = None):
+    async def peck(self, ctx, member: discord.Member):
         """Peck a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para picotear!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes picotearte a ti mismo!")
             return
@@ -484,12 +376,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='lurk')
-    async def lurk(self, ctx, member: discord.Member = None):
+    async def lurk(self, ctx, member: discord.Member):
         """Lurk at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para acechar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes acecharte a ti mismo!")
             return
@@ -517,12 +405,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='sleep')
-    async def sleep(self, ctx, member: discord.Member = None):
+    async def sleep(self, ctx, member: discord.Member):
         """Sleep with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para dormir!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes dormir contigo mismo!")
             return
@@ -550,12 +434,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='wink')
-    async def wink(self, ctx, member: discord.Member = None):
+    async def wink(self, ctx, member: discord.Member):
         """Wink at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para guiñar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes guiñarte a ti mismo!")
             return
@@ -583,12 +463,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='yawn')
-    async def yawn(self, ctx, member: discord.Member = None):
+    async def yawn(self, ctx, member: discord.Member):
         """Yawn at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para bostezar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes bostezar contigo mismo!")
             return
@@ -616,12 +492,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='nom')
-    async def nom(self, ctx, member: discord.Member = None):
+    async def nom(self, ctx, member: discord.Member):
         """Nom a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para nom!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes nom contigo mismo!")
             return
@@ -649,12 +521,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='yeet')
-    async def yeet(self, ctx, member: discord.Member = None):
+    async def yeet(self, ctx, member: discord.Member):
         """Yeet a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para yeet!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes yeet a ti mismo!")
             return
@@ -682,12 +550,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='think')
-    async def think(self, ctx, member: discord.Member = None):
+    async def think(self, ctx, member: discord.Member):
         """Think about a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para pensar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes pensar en ti mismo!")
             return
@@ -715,12 +579,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='bored')
-    async def bored(self, ctx, member: discord.Member = None):
+    async def bored(self, ctx, member: discord.Member):
         """Be bored with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para aburrirte!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes aburrirte contigo mismo!")
             return
@@ -748,12 +608,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='blush')
-    async def blush(self, ctx, member: discord.Member = None):
+    async def blush(self, ctx, member: discord.Member):
         """Blush at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para sonrojar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes sonrojarte contigo mismo!")
             return
@@ -781,12 +637,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='stare')
-    async def stare(self, ctx, member: discord.Member = None):
+    async def stare(self, ctx, member: discord.Member):
         """Stare at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para mirar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes mirarte a ti mismo!")
             return
@@ -814,12 +666,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='nod')
-    async def nod(self, ctx, member: discord.Member = None):
+    async def nod(self, ctx, member: discord.Member):
         """Nod at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para asentir!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes asentir contigo mismo!")
             return
@@ -847,12 +695,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='handhold')
-    async def handhold(self, ctx, member: discord.Member = None):
+    async def handhold(self, ctx, member: discord.Member):
         """Hold hands with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para tomar de la mano!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes tomar tu propia mano!")
             return
@@ -880,12 +724,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='smug')
-    async def smug(self, ctx, member: discord.Member = None):
+    async def smug(self, ctx, member: discord.Member):
         """Be smug at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para ser presumido!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes ser presumido contigo mismo!")
             return
@@ -913,12 +753,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='fuck')
-    async def fuck(self, ctx, member: discord.Member = None):
+    async def fuck(self, ctx, member: discord.Member):
         """Fuck a user with an anime GIF (NSFW)"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para follar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes follarte a ti mismo!")
             return
@@ -952,12 +788,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='spank')
-    async def spank(self, ctx, member: discord.Member = None):
+    async def spank(self, ctx, member: discord.Member):
         """Spank a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para azotar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes azotarte a ti mismo!")
             return
@@ -985,12 +817,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='nutkick')
-    async def nutkick(self, ctx, member: discord.Member = None):
+    async def nutkick(self, ctx, member: discord.Member):
         """Nutkick a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para patada en las bolas!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes patearte las bolas a ti mismo!")
             return
@@ -1018,12 +846,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='shrug')
-    async def shrug(self, ctx, member: discord.Member = None):
+    async def shrug(self, ctx, member: discord.Member):
         """Shrug at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para encogerse de hombros!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes encogerte de hombros contigo mismo!")
             return
@@ -1051,12 +875,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='poke')
-    async def poke(self, ctx, member: discord.Member = None):
+    async def poke(self, ctx, member: discord.Member):
         """Poke a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para picar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes picarte a ti mismo!")
             return
@@ -1084,12 +904,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='smile')
-    async def smile(self, ctx, member: discord.Member = None):
+    async def smile(self, ctx, member: discord.Member):
         """Smile at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para sonreír!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes sonreírte a ti mismo!")
             return
@@ -1117,12 +933,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='facepalm')
-    async def facepalm(self, ctx, member: discord.Member = None):
+    async def facepalm(self, ctx, member: discord.Member):
         """Facepalm at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para facepalm!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes hacer facepalm contigo mismo!")
             return
@@ -1150,12 +962,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='cuddle')
-    async def cuddle(self, ctx, member: discord.Member = None):
+    async def cuddle(self, ctx, member: discord.Member):
         """Cuddle a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para acurrucar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes acurrucarte contigo mismo!")
             return
@@ -1183,12 +991,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='baka')
-    async def baka(self, ctx, member: discord.Member = None):
+    async def baka(self, ctx, member: discord.Member):
         """Call someone baka with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para llamar baka!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes llamarte baka a ti mismo!")
             return
@@ -1216,12 +1020,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='angry')
-    async def angry(self, ctx, member: discord.Member = None):
+    async def angry(self, ctx, member: discord.Member):
         """Be angry at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para enojarte!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes enojarte contigo mismo!")
             return
@@ -1249,12 +1049,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='run')
-    async def run(self, ctx, member: discord.Member = None):
+    async def run(self, ctx, member: discord.Member):
         """Run with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para correr!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes correr contigo mismo!")
             return
@@ -1282,12 +1078,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='nope')
-    async def nope(self, ctx, member: discord.Member = None):
+    async def nope(self, ctx, member: discord.Member):
         """Nope at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para nope!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes nope contigo mismo!")
             return
@@ -1315,12 +1107,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='handshake')
-    async def handshake(self, ctx, member: discord.Member = None):
+    async def handshake(self, ctx, member: discord.Member):
         """Handshake with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para estrechar la mano!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes estrechar tu propia mano!")
             return
@@ -1348,12 +1136,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='cry')
-    async def cry(self, ctx, member: discord.Member = None):
+    async def cry(self, ctx, member: discord.Member):
         """Cry with a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para llorar!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes llorar contigo mismo!")
             return
@@ -1381,12 +1165,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='pout')
-    async def pout(self, ctx, member: discord.Member = None):
+    async def pout(self, ctx, member: discord.Member):
         """Pout at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para hacer pucheros!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes hacer pucheros contigo mismo!")
             return
@@ -1414,12 +1194,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='thumbsup')
-    async def thumbsup(self, ctx, member: discord.Member = None):
+    async def thumbsup(self, ctx, member: discord.Member):
         """Thumbs up at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para thumbs up!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes dar thumbs up a ti mismo!")
             return
@@ -1447,12 +1223,8 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='laugh')
-    async def laugh(self, ctx, member: discord.Member = None):
+    async def laugh(self, ctx, member: discord.Member):
         """Laugh at a user with an anime GIF"""
-        if member is None:
-            await ctx.send("❌ Por favor menciona a un usuario para reír!")
-            return
-
         if member == ctx.author:
             await ctx.send("❌ No puedes reírte de ti mismo!")
             return
