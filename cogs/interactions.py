@@ -18,23 +18,27 @@ class InteractionsCog(commands.Cog):
             await ctx.send("❌ No puedes abofetearte a ti mismo!")
             return
 
-        gif_url = gif_api.get_gif_url("anime slap")
-        print(f"DEBUG: Slap GIF URL: {gif_url}")  # Debug line
-
-        embed = discord.Embed(
-            title="👋 Bofetada!",
-            description=f"{ctx.author.mention} le dio una bofetada a {member.mention}!",
-            color=0xff6b6b
-        )
-        embed.set_image(url=gif_url)
-        embed.set_footer(text="¡Ay! Eso tuvo que doler!")
-
         try:
+            gif_url = gif_api.get_gif_url("anime slap")
+            print(f"DEBUG: Slap GIF URL: {gif_url}")  # Debug line
+
+            embed = discord.Embed(
+                title="👋 Bofetada!",
+                description=f"{ctx.author.mention} le dio una bofetada a {member.mention}!",
+                color=0xff6b6b
+            )
+            embed.set_image(url=gif_url)
+            embed.set_footer(text="¡Ay! Eso tuvo que doler!")
+
             await ctx.send(embed=embed)
         except Exception as e:
-            print(f"Error sending slap embed: {e}")
-            # Fallback: send just the text and URL
-            await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} le dio una bofetada a {member.mention}!\n¡Ay! Eso tuvo que doler!\n{gif_url}")
+            print(f"Error in slap command: {e}")
+            try:
+                # Fallback: send just the text and URL
+                await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} le dio una bofetada a {member.mention}!\n¡Ay! Eso tuvo que doler!\n*(Error al cargar el GIF)*")
+            except Exception as fallback_error:
+                print(f"Fallback error in slap: {fallback_error}")
+                await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='hug')
     async def hug(self, ctx, member: discord.Member = None):
