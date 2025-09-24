@@ -129,9 +129,11 @@ class GifAPI:
 
                 if response.status_code == 200:
                     data = response.json()
-                    if 'data' in data and len(data['data']) > 0:
-                        item = data['data'][0]
+                    print(f"DEBUG: Nekos.best API response for {action}: {data}")  # Debug line
+                    if 'results' in data and len(data['results']) > 0:
+                        item = data['results'][0]
                         if 'url' in item:
+                            print(f"DEBUG: Found GIF URL: {item['url']}")  # Debug line
                             return item['url']
 
         except Exception as e:
