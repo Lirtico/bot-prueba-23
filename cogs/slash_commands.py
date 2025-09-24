@@ -30,19 +30,117 @@ class HelpSelect(Select):
             category_key = self.values[0]
             category_data = COMMAND_CATEGORIES[category_key]
 
-            embed = discord.Embed(
-                title=category_data["name"],
-                description=category_data["description"],
-                color=category_data["color"]
-            )
+            # Check if category has too many commands (Discord limit is 25 fields per embed)
+            commands_list = list(category_data["commands"].items())
+            max_fields_per_embed = 25
 
-            # Add commands to embed
-            for command, description in category_data["commands"].items():
-                embed.add_field(name=command, value=description, inline=False)
+            if len(commands_list) <= max_fields_per_embed:
+                # Single embed - fits within limit
+                embed = discord.Embed(
+                    title=category_data["name"],
+                    description=category_data["description"],
+                    color=category_data["color"]
+                )
 
-            embed.set_footer(text="Usa /help para volver al menú principal")
+                for command, description in commands_list:
+                    embed.add_field(name=command, value=description, inline=False)
 
-            await interaction.response.edit_message(embed=embed, view=self.view)
+                embed.set_footer(text="Usa /help para volver al menú principal")
+                await interaction.response.edit_message(embed=embed, view=self.view)
+            else:
+                # Multiple embeds needed - split into pages
+                embeds = []
+                total_commands = len(commands_list)
+
+                for i in range(0, total_commands, max_fields_per_embed):
+                    page_commands = commands_list[i:i + max_fields_per_embed]
+                    page_number = i // max_fields_per_embed + 1
+                    total_pages = (total_commands + max_fields_per_embed - 1) // max_fields_per_embed
+
+                    embed = discord.Embed(
+                        title=f"{category_data['name']} (Página {page_number}/{total_pages})",
+                        description=category_data["description"],
+                        color=category_data["color"]
+                    )
+
+                    for command, description in page_commands:
+                        embed.add_field(name=command, value=description, inline=False)
+
+                    embed.set_footer(text=f"Usa /help para volver al menú principal • Página {page_number}/{total_pages}")
+                    embeds.append(embed)
+
+                # Send first page and add navigation buttons
+                from discord.ui import Button
+
+                class PageView(View):
+                    def __init__(self, embeds_list, start_page=0):
+                        super().__init__(timeout=300)
+                        self.embeds = embeds_list
+                        self.current_page = start_page
+
+                    async def update_message(self, interaction):
+                        await interaction.response.edit_message(embed=self.embeds[self.current_page], view=self)
+
+                    @discord.ui.button(label="⬅️ Anterior", style=discord.ButtonStyle.gray, disabled=True)
+                    async def previous_button(self, interaction: discord.Interaction, button: Button):
+                        self.current_page = max(0, self.current_page - 1)
+                        # Update button states
+                        for child in self.children:
+                            if isinstance(child, Button):
+                                if child.label == "⬅️ Anterior":
+                                    child.disabled = self.current_page == 0
+                                elif child.label == "➡️ Siguiente":
+                                    child.disabled = self.current_page >= len(self.embeds) - 1
+
+                        await self.update_message(interaction)
+
+                    @discord.ui.button(label="➡️ Siguiente", style=discord.ButtonStyle.gray)
+                    async def next_button(self, interaction: discord.Interaction, button: Button):
+                        self.current_page = min(len(self.embeds) - 1, self.current_page + 1)
+                        # Update button states
+                        for child in self.children:
+                            if isinstance(child, Button):
+                                if child.label == "⬅️ Anterior":
+                                    child.disabled = self.current_page == 0
+                                elif child.label == "➡️ Siguiente":
+                                    child.disabled = self.current_page >= len(self.embeds) - 1
+
+                        await self.update_message(interaction)
+
+                    @discord.ui.button(label="🏠 Menú Principal", style=discord.ButtonStyle.green)
+                    async def home_button(self, interaction: discord.Interaction, button: Button):
+                        # Go back to main help menu
+                        main_embed = discord.Embed(
+                            title="🐨 Ayuda de Koala Bot",
+                            description="¡Hola! Soy Koala Bot, tu bot de Discord multifuncional. Selecciona una categoría para ver sus comandos:",
+                            color=0x0099ff
+                        )
+
+                        # Add some stats
+                        main_embed.add_field(
+                            name="📊 Estadísticas",
+                            value=f"• **{len(COMMAND_CATEGORIES)} categorías**\n"
+                                  f"• **{sum(len(cat['commands']) for cat in COMMAND_CATEGORIES.values())} comandos**\n"
+                                  f"• **50+ interacciones** con GIFs",
+                            inline=False
+                        )
+
+                        main_embed.add_field(
+                            name="🎮 Cómo usar",
+                            value="• Usa el menú desplegable para seleccionar una categoría\n"
+                                  "• Cada categoría muestra sus comandos disponibles\n"
+                                  "• Los comandos están organizados por funcionalidad",
+                            inline=False
+                        )
+
+                        main_embed.set_footer(text="¡Selecciona una categoría para comenzar!")
+
+                        main_view = HelpView(self.bot)
+                        await interaction.response.edit_message(embed=main_embed, view=main_view)
+
+                view = PageView(embeds)
+                await interaction.response.edit_message(embed=embeds[0], view=view)
+
         except Exception as e:
             # Log the error and send a user-friendly message
             print(f"Error in help callback: {e}")
