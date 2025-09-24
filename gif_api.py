@@ -110,7 +110,7 @@ class GifAPI:
             }
         }
 
-        # Working GIF URLs that Discord can display properly - using more reliable sources
+        # Working GIF URLs that Discord can display properly - using reliable sources
         self.fallback_gifs = {
             'anime slap': 'https://media.tenor.com/4c6o4l1lE8AAAAAC/anime-slap.gif',
             'anime hug': 'https://media.tenor.com/2rBJ8p2b9oAAAAAC/anime-hug.gif',
