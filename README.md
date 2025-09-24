@@ -1,215 +1,222 @@
-# Enhanced Discord Bot
+# 🐨 Koala Bot
 
-A feature-rich, modular Discord bot with advanced moderation, logging, and community management capabilities.
+Un bot de Discord multifuncional y modular con características avanzadas de moderación, interacciones divertidas y utilidades para servidores.
 
-## Features
+## ✨ Características
 
-### 🤖 Core Features
-- **Modular Architecture** - Organized into separate cogs for easy maintenance
-- **Advanced Moderation** - Automated threat detection and user management
-- **Comprehensive Logging** - Detailed logging of all bot activities and events
-- **Database Integration** - SQLite database for persistent data storage
-- **Jail System** - Automated user isolation for rule violations
-- **Statistics Tracking** - Command usage and bot performance analytics
+### 🤖 Características Principales
+- **Arquitectura Modular** - Organizado en cogs separados para fácil mantenimiento
+- **Comandos de Moderación** - Sistema completo de moderación con cárcel y advertencias
+- **Interacciones con GIFs** - Más de 50 comandos de interacciones con GIFs anime
+- **Comandos de Diversión** - Entretenimiento con dados, chistes, memes y más
+- **Utilidades Avanzadas** - Información de usuarios, servidores, clima, traductor
+- **Sistema de Logging** - Registro detallado de eventos y actividades
+- **Soporte Multi-idioma** - Comandos en español
 
-### 🛡️ Security & Moderation
-- **Threat Detection** - Real-time analysis for spam, raids, and malicious content
-- **Auto-moderation** - Automatic responses to detected threats
-- **User Jail System** - Temporary isolation of problematic users
-- **Message Filtering** - Automatic deletion of malicious links and spam
-- **Warning System** - Progressive discipline for rule violations
+### 🛡️ Moderación y Seguridad
+- **Sistema de Cárcel** - Aislamiento temporal de usuarios problemáticos
+- **Sistema de Advertencias** - Disciplina progresiva para violaciones
+- **Detección de Amenazas** - Análisis en tiempo real de spam y raids
+- **Filtrado de Mensajes** - Eliminación automática de enlaces maliciosos
+- **Gestión de Roles** - Asignación y gestión avanzada de roles
 
-### 📊 Analytics & Logging
-- **Event Logging** - All server events logged to database
-- **Command Tracking** - Usage statistics for all bot commands
-- **Performance Monitoring** - Bot uptime and latency tracking
-- **User Activity** - Member join/leave tracking and analytics
+### 🎭 Interacciones y Diversión
+- **50+ Comandos de Interacción** - Hug, slap, kiss, pat, tickle, y muchos más
+- **Comandos de Anime** - Todos los comandos incluyen GIFs de anime
+- **Comandos Divertidos** - Dados, chistes, memes, 8-ball, calculadora
+- **Comandos de Comunidad** - Encuestas, recordatorios, clima, traductor
 
-### 🎯 Community Features
-- **Custom Commands** - Extensible command system
-- **Role Management** - Advanced role assignment and management
-- **Welcome System** - Automated member onboarding
-- **Fun Commands** - Entertainment features for community engagement
+### 📊 Información y Utilidades
+- **Información de Usuarios** - Avatar, banner, información detallada
+- **Información de Servidor** - Estadísticas completas del servidor
+- **Información de Canales** - Detalles de canales y permisos
+- **Información de Roles** - Información detallada de roles
 
-## Installation
+## 🚀 Instalación
 
-### Prerequisites
-- Python 3.12 or higher
-- Discord Bot Token (from [Discord Developer Portal](https://discord.com/developers/applications))
+### Prerrequisitos
+- Python 3.8 o superior
+- Token de Bot de Discord (de [Discord Developer Portal](https://discord.com/developers/applications))
 
-### Setup
-1. **Clone or download** the bot files to your local machine
+### Configuración
+1. **Clona o descarga** los archivos del bot
 
-2. **Install dependencies**:
+2. **Instala las dependencias**:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Configure the bot**:
-   - Copy `.env` and update with your bot token and settings
-   - Required: `DISCORD_TOKEN=your_bot_token_here`
+3. **Configura el bot**:
+   - Edita `main.py` y reemplaza `"YOUR_BOT_TOKEN_HERE"` con tu token real
+   - O usa variables de entorno: `export DISCORD_TOKEN=tu_token_aqui`
 
-4. **Test the installation**:
+4. **Prueba la instalación**:
    ```bash
    python test_bot.py
    ```
 
-5. **Run the bot**:
+5. **Ejecuta el bot**:
    ```bash
    python main.py
    ```
 
-## Configuration
-
-The bot uses environment variables for configuration. Copy `.env` and update the following:
-
-### Required Settings
-- `DISCORD_TOKEN` - Your Discord bot token
-- `DISCORD_APPLICATION_ID` - Your bot's application ID
-
-### Optional Settings
-- `ENVIRONMENT` - Set to 'production' for production use
-- `DEBUG` - Enable/disable debug mode
-- `DATABASE_URL` - Database connection string
-- `LOG_LEVEL` - Logging level (DEBUG, INFO, WARNING, ERROR)
-
-## Project Structure
+## 📁 Estructura del Proyecto
 
 ```
-├── main.py              # Main bot application
-├── config.py            # Configuration management
-├── database.py          # Database operations
-├── logging_config.py    # Logging system
-├── detection.py         # Threat detection engine
-├── requirements.txt     # Python dependencies
-├── .env                 # Environment configuration
-├── test_bot.py          # Test script
-├── railway.json         # Deployment configuration
-└── cogs/                # Bot modules
-    ├── admin.py         # Administrative commands
-    ├── moderation.py    # Moderation tools
-    ├── logging.py       # Logging management
-    ├── jail.py          # Jail system
-    ├── utility.py       # Utility commands
-    ├── fun.py           # Entertainment features
-    ├── community.py     # Community management
-    ├── error_handler.py # Error handling
-    └── help.py          # Help system
+├── main.py                    # Aplicación principal del bot
+├── config/                    # Configuración
+│   ├── settings.py           # Configuraciones del bot
+│   └── categories.py         # Categorías de comandos
+├── cogs/                     # Módulos del bot
+│   ├── moderation.py         # Comandos de moderación
+│   ├── interactions.py       # Interacciones con GIFs
+│   ├── user_commands.py      # Comandos de usuario
+│   ├── fun_commands.py       # Comandos divertidos
+│   ├── utility_commands.py   # Comandos de utilidad
+│   └── community_commands.py # Comandos comunitarios
+├── events/                   # Eventos del bot
+│   ├── logging_events.py     # Eventos de logging
+│   └── bot_events.py         # Eventos del bot
+├── core/                     # Componentes core
+│   └── bot.py               # Funcionalidad core
+├── TODO.md                   # Lista de tareas
+├── requirements.txt          # Dependencias de Python
+├── railway.json             # Configuración de despliegue
+└── README.md                # Este archivo
 ```
 
-## Bot Commands
+## 🎮 Comandos Disponibles
 
-### Administrative Commands
-- `/admin status` - View bot statistics and status
-- `/admin reload` - Reload bot configuration
-- `/admin shutdown` - Gracefully shutdown the bot
+### 🛠️ Moderación
+- `!ban <usuario> [razón]` - Banear a un usuario
+- `!kick <usuario> [razón]` - Expulsar a un usuario
+- `!mute <usuario> [tiempo] [razón]` - Silenciar a un usuario
+- `!unmute <usuario>` - Des-silenciar a un usuario
+- `!warn <usuario> [razón]` - Advertir a un usuario
+- `!jail <usuario> [tiempo] [razón]` - Enviar a un usuario a la cárcel
+- `!unjail <usuario>` - Sacar a un usuario de la cárcel
 
-### Moderation Commands
-- `/moderate warn <user> <reason>` - Warn a user
-- `/moderate kick <user> <reason>` - Kick a user
-- `/moderate ban <user> <reason>` - Ban a user
-- `/moderate unban <user>` - Unban a user
+### 🎭 Interacciones (50+ comandos)
+- `!hug <usuario>` - Abrazar a un usuario
+- `!slap <usuario>` - Abofetear a un usuario
+- `!kiss <usuario>` - Besar a un usuario
+- `!pat <usuario>` - Acariciar a un usuario
+- `!tickle <usuario>` - Hacer cosquillas
+- `!feed <usuario>` - Alimentar a un usuario
+- `!punch <usuario>` - Golpear a un usuario
+- `!highfive <usuario>` - Chocar los cinco
+- `!bite <usuario>` - Morder a un usuario
+- `!shoot <usuario>` - Disparar a un usuario
+- Y muchos más...
 
-### Jail System
-- `/jail <user> <duration> <reason>` - Jail a user
-- `/unjail <user>` - Release a user from jail
-- `/jail status <user>` - Check jail status
+### 👤 Información de Usuario
+- `!avatar [usuario]` - Ver avatar de un usuario
+- `!userinfo [usuario]` - Información detallada de un usuario
+- `!banner [usuario]` - Ver banner de un usuario
+- `!serverinfo` - Información del servidor
+- `!serverstats` - Estadísticas del servidor
+- `!roleinfo <rol>` - Información de un rol
+- `!channelinfo [canal]` - Información de un canal
 
-### Utility Commands
-- `/info user <user>` - Get user information
-- `/info server` - Get server information
-- `/stats` - View bot statistics
+### 🎲 Diversión y Entretenimiento
+- `!roll <dados>` - Tirar dados (ej: 1d20, 2d6+3)
+- `!coinflip` - Lanzar una moneda
+- `!joke` - Obtener un chiste aleatorio
+- `!fact` - Obtener un dato curioso
+- `!meme` - Obtener un meme de programador
+- `!8ball <pregunta>` - Preguntar a la bola 8 mágica
+- `!choose <opción1, opción2, ...>` - Elegir entre opciones
+- `!rate <algo>` - Calificar algo del 1-10
+- `!password [longitud]` - Generar una contraseña segura
 
-### Fun Commands
-- `/fun joke` - Get a random joke
-- `/fun meme` - Get a random meme
-- `/fun roll <dice>` - Roll dice
+### 🔧 Utilidades
+- `!ping` - Ver latencia del bot
+- `!help [categoría]` - Mostrar ayuda organizada
+- `!commands` - Lista simple de comandos
+- `!invite` - Obtener enlace de invitación
+- `!uptime` - Ver tiempo de actividad
+- `!stats` - Ver estadísticas del bot
+- `!suggest <sugerencia>` - Enviar una sugerencia
+- `!bug <reporte>` - Reportar un bug
+- `!info` - Información sobre el bot
 
-## Database Schema
+### 🏘️ Comunidad
+- `!poll <pregunta>` - Crear una encuesta
+- `!remind <minutos> <mensaje>` - Establecer un recordatorio
+- `!weather <ciudad>` - Ver el clima de una ciudad
+- `!calc <expresión>` - Calculadora simple
+- `!urban <término>` - Buscar en Urban Dictionary
+- `!translate <idioma> <texto>` - Traducir texto
+- `!covid [país]` - Estadísticas de COVID-19
+- `!jokeapi [categoría]` - Chistes de JokeAPI
 
-The bot uses SQLite with the following main tables:
-- `guilds` - Server information and settings
-- `users` - User profiles and statistics
-- `events` - Event logging and audit trail
-- `command_usage` - Command usage tracking
-- `jail_records` - Jail system records
-- `warnings` - User warning records
+## ⚙️ Configuración
 
-## Deployment
+### Variables de Entorno (Opcional)
+```bash
+export DISCORD_TOKEN=tu_token_de_bot_aqui
+export TENOR_API_KEY=tu_api_key_de_tenor  # Para GIFs
+```
 
-### Local Development
+### Configuración en Código
+- Edita `config/settings.py` para configuraciones avanzadas
+- Modifica `config/categories.py` para personalizar categorías de ayuda
+
+## 🚀 Despliegue
+
+### Desarrollo Local
 ```bash
 python main.py
 ```
 
-### Production Deployment
-The bot includes Railway deployment configuration. Update the following in `railway.json`:
-- `DISCORD_TOKEN` - Your production bot token
-- Database connection settings
-- Environment variables
+### Despliegue en Producción
+- Actualiza `railway.json` con tu token de bot
+- Despliega en Railway, Heroku, o cualquier plataforma que soporte Python
 
-## Monitoring & Maintenance
+## 📊 Estadísticas
 
-### Logs
-- All bot activities are logged to the database
-- Console logs provide real-time monitoring
-- Log files are created in the `logs/` directory
+- **Comandos:** 50+ comandos disponibles
+- **Interacciones:** 50+ comandos de interacciones con GIFs
+- **Idioma:** Comandos en español
+- **Moderación:** Sistema completo de moderación
+- **Diversión:** Entretenimiento variado para la comunidad
 
-### Database Management
-- Use the admin commands to manage database records
-- Regular backups recommended for production use
-- Database migrations handled automatically by Alembic
+## 🐛 Solución de Problemas
 
-### Performance
-- Bot includes built-in performance monitoring
-- Command execution times are tracked
-- Memory and CPU usage monitoring available
+### Problemas Comunes
+1. **El bot no responde a comandos**
+   - Verifica que el token del bot sea correcto
+   - Asegúrate de que el bot tenga permisos en el servidor
+   - Revisa que los comandos estén registrados correctamente
 
-## Troubleshooting
+2. **Error de dependencias**
+   - Ejecuta `pip install -r requirements.txt`
+   - Verifica la versión de Python (3.8+)
 
-### Common Issues
-1. **Bot doesn't respond to commands**
-   - Check that the bot token is correct
-   - Verify bot has proper permissions in the server
-   - Check that commands are properly registered
+3. **Error de token**
+   - Reemplaza `"YOUR_BOT_TOKEN_HERE"` en `main.py` con tu token real
+   - O usa variables de entorno
 
-2. **Database connection errors**
-   - Ensure database file permissions are correct
-   - Check database URL configuration
-   - Verify SQLite is available
+## 🤝 Contribuir
 
-3. **Import errors**
-   - Run `pip install -r requirements.txt`
-   - Check Python version compatibility
-   - Verify all dependencies are installed
+1. Haz un fork del repositorio
+2. Crea una rama para tu feature
+3. Haz tus cambios
+4. Prueba exhaustivamente
+5. Envía un pull request
 
-### Debug Mode
-Enable debug mode in `.env`:
-```
-DEBUG=true
-LOG_LEVEL=DEBUG
-```
+## 📄 Licencia
 
-## Contributing
+Este proyecto está bajo la Licencia MIT.
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+## 🆘 Soporte
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support and questions:
-- Check the troubleshooting section
-- Review the logs for error messages
-- Test with the provided test script
-- Check Discord.py documentation for API issues
+Para soporte y preguntas:
+- Revisa la sección de solución de problemas
+- Revisa los logs para mensajes de error
+- Prueba con el script de test incluido
+- Revisa la documentación de discord.py para problemas de API
 
 ---
 
-**Happy botting!** 🤖✨
+**¡Feliz boteo!** 🐨✨

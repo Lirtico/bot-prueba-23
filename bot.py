@@ -9,6 +9,10 @@ import requests
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
+# Import our custom modules
+from gif_api import gif_api
+from config import nsfw_settings, BOT_CONFIG, COMMAND_CATEGORIES
+
 # Load environment variables
 load_dotenv()
 TOKEN = os.getenv('DISCORD_BOT_TOKEN')
@@ -913,7 +917,7 @@ async def help_command(ctx):
 
     embed.add_field(
         name="📊 Estadísticas",
-        value=f"**Categorías:** 7\n"
+        value=f"**Categorías:** 8\n"
               f"**Comandos totales:** 80+\n"
               f"**Última actualización:** {datetime.now().strftime('%d/%m/%Y')}",
         inline=False
