@@ -11,7 +11,12 @@ COMMAND_CATEGORIES = {
             "`/invite`": "Obtener enlace de invitación",
             "`/uptime`": "Tiempo de actividad del bot",
             "`/suggest`": "Enviar sugerencias",
-            "`/bug`": "Reportar bugs"
+            "`/bug`": "Reportar bugs",
+            "`/slap <usuario>`": "Abofetear a un usuario con GIF",
+            "`/hug <usuario>`": "Abrazar a un usuario con GIF",
+            "`/kiss <usuario>`": "Besar a un usuario con GIF",
+            "`/pat <usuario>`": "Acariciar a un usuario con GIF",
+            "`/cuddle <usuario>`": "Acurrucar a un usuario con GIF"
         },
         "color": 0x5865f2
     },

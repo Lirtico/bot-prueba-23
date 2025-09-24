@@ -426,5 +426,136 @@ class SlashCommandsCog(commands.Cog):
 
         await interaction.response.send_message(embed=embed, ephemeral=True)
 
+    # Anime Interaction Slash Commands
+    @app_commands.command(name="slap", description="Abofetear a un usuario con un GIF anime")
+    @app_commands.describe(member="Usuario a abofetear")
+    async def slap_slash(self, interaction: discord.Interaction, member: discord.Member):
+        """Slap a user with an anime GIF"""
+        if member == interaction.user:
+            embed = discord.Embed(
+                title="❌ Error",
+                description="¡No puedes abofetearte a ti mismo!",
+                color=0xff0000
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        from gif_api import gif_api
+        gif_url = gif_api.get_gif_url("anime slap")
+
+        embed = discord.Embed(
+            title="👋 Bofetada!",
+            description=f"{interaction.user.mention} le dio una bofetada a {member.mention}!",
+            color=0xff6b6b
+        )
+        embed.set_image(url=gif_url)
+        embed.set_footer(text="¡Ay! Eso tuvo que doler!")
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="hug", description="Abrazar a un usuario con un GIF anime")
+    @app_commands.describe(member="Usuario a abrazar")
+    async def hug_slash(self, interaction: discord.Interaction, member: discord.Member):
+        """Hug a user with an anime GIF"""
+        if member == interaction.user:
+            embed = discord.Embed(
+                title="❌ Error",
+                description="¡No puedes abrazarte a ti mismo!",
+                color=0xff0000
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        from gif_api import gif_api
+        gif_url = gif_api.get_gif_url("anime hug")
+
+        embed = discord.Embed(
+            title="🤗 Abrazo!",
+            description=f"{interaction.user.mention} abrazó a {member.mention}!",
+            color=0xffb3ba
+        )
+        embed.set_image(url=gif_url)
+        embed.set_footer(text="¡Aww, qué lindo!")
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="kiss", description="Besar a un usuario con un GIF anime")
+    @app_commands.describe(member="Usuario a besar")
+    async def kiss_slash(self, interaction: discord.Interaction, member: discord.Member):
+        """Kiss a user with an anime GIF"""
+        if member == interaction.user:
+            embed = discord.Embed(
+                title="❌ Error",
+                description="¡No puedes besarte a ti mismo!",
+                color=0xff0000
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        from gif_api import gif_api
+        gif_url = gif_api.get_gif_url("anime kiss")
+
+        embed = discord.Embed(
+            title="💋 Beso!",
+            description=f"{interaction.user.mention} besó a {member.mention}!",
+            color=0xff69b4
+        )
+        embed.set_image(url=gif_url)
+        embed.set_footer(text="¡Qué romántico!")
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="pat", description="Acariciar a un usuario con un GIF anime")
+    @app_commands.describe(member="Usuario a acariciar")
+    async def pat_slash(self, interaction: discord.Interaction, member: discord.Member):
+        """Pat a user with an anime GIF"""
+        if member == interaction.user:
+            embed = discord.Embed(
+                title="❌ Error",
+                description="¡No puedes acariciarte a ti mismo!",
+                color=0xff0000
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        from gif_api import gif_api
+        gif_url = gif_api.get_gif_url("anime pat")
+
+        embed = discord.Embed(
+            title="👋 Caricia!",
+            description=f"{interaction.user.mention} acarició a {member.mention}!",
+            color=0x98d8c8
+        )
+        embed.set_image(url=gif_url)
+        embed.set_footer(text="¡Buen trabajo!")
+
+        await interaction.response.send_message(embed=embed)
+
+    @app_commands.command(name="cuddle", description="Acurrucar a un usuario con un GIF anime")
+    @app_commands.describe(member="Usuario a acurrucar")
+    async def cuddle_slash(self, interaction: discord.Interaction, member: discord.Member):
+        """Cuddle a user with an anime GIF"""
+        if member == interaction.user:
+            embed = discord.Embed(
+                title="❌ Error",
+                description="¡No puedes acurrucarte contigo mismo!",
+                color=0xff0000
+            )
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return
+
+        from gif_api import gif_api
+        gif_url = gif_api.get_gif_url("anime cuddle")
+
+        embed = discord.Embed(
+            title="🤗 Acurrucando!",
+            description=f"{interaction.user.mention} acurrucó a {member.mention}!",
+            color=0xffb3ba
+        )
+        embed.set_image(url=gif_url)
+        embed.set_footer(text="¡Qué tierno!")
+
+        await interaction.response.send_message(embed=embed)
+
 async def setup(bot):
     await bot.add_cog(SlashCommandsCog(bot))

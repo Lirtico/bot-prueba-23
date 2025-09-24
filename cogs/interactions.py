@@ -19,6 +19,7 @@ class InteractionsCog(commands.Cog):
             return
 
         gif_url = gif_api.get_gif_url("anime slap")
+        print(f"DEBUG: Slap GIF URL: {gif_url}")  # Debug line
 
         embed = discord.Embed(
             title="👋 Bofetada!",
@@ -28,7 +29,12 @@ class InteractionsCog(commands.Cog):
         embed.set_image(url=gif_url)
         embed.set_footer(text="¡Ay! Eso tuvo que doler!")
 
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except Exception as e:
+            print(f"Error sending slap embed: {e}")
+            # Fallback: send just the text and URL
+            await ctx.send(f"👋 **Bofetada!** {ctx.author.mention} le dio una bofetada a {member.mention}!\n¡Ay! Eso tuvo que doler!\n{gif_url}")
 
     @commands.command(name='hug')
     async def hug(self, ctx, member: discord.Member = None):
@@ -42,6 +48,7 @@ class InteractionsCog(commands.Cog):
             return
 
         gif_url = gif_api.get_gif_url("anime hug")
+        print(f"DEBUG: Hug GIF URL: {gif_url}")  # Debug line
 
         embed = discord.Embed(
             title="🤗 Abrazo!",
@@ -51,7 +58,12 @@ class InteractionsCog(commands.Cog):
         embed.set_image(url=gif_url)
         embed.set_footer(text="¡Aww, qué lindo!")
 
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except Exception as e:
+            print(f"Error sending hug embed: {e}")
+            # Fallback: send just the text and URL
+            await ctx.send(f"🤗 **Abrazo!** {ctx.author.mention} abrazó a {member.mention}!\n¡Aww, qué lindo!\n{gif_url}")
 
     @commands.command(name='kiss')
     async def kiss(self, ctx, member: discord.Member = None):
@@ -65,6 +77,7 @@ class InteractionsCog(commands.Cog):
             return
 
         gif_url = gif_api.get_gif_url("anime kiss")
+        print(f"DEBUG: Kiss GIF URL: {gif_url}")  # Debug line
 
         embed = discord.Embed(
             title="💋 Beso!",
@@ -74,7 +87,12 @@ class InteractionsCog(commands.Cog):
         embed.set_image(url=gif_url)
         embed.set_footer(text="¡Qué romántico!")
 
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except Exception as e:
+            print(f"Error sending kiss embed: {e}")
+            # Fallback: send just the text and URL
+            await ctx.send(f"💋 **Beso!** {ctx.author.mention} besó a {member.mention}!\n¡Qué romántico!\n{gif_url}")
 
     @commands.command(name='pat')
     async def pat(self, ctx, member: discord.Member = None):
@@ -88,6 +106,7 @@ class InteractionsCog(commands.Cog):
             return
 
         gif_url = gif_api.get_gif_url("anime pat")
+        print(f"DEBUG: Pat GIF URL: {gif_url}")  # Debug line
 
         embed = discord.Embed(
             title="👋 Caricia!",
@@ -97,7 +116,12 @@ class InteractionsCog(commands.Cog):
         embed.set_image(url=gif_url)
         embed.set_footer(text="¡Buen trabajo!")
 
-        await ctx.send(embed=embed)
+        try:
+            await ctx.send(embed=embed)
+        except Exception as e:
+            print(f"Error sending pat embed: {e}")
+            # Fallback: send just the text and URL
+            await ctx.send(f"👋 **Caricia!** {ctx.author.mention} acarició a {member.mention}!\n¡Buen trabajo!\n{gif_url}")
 
     @commands.command(name='tickle')
     async def tickle(self, ctx, member: discord.Member = None):
