@@ -7,7 +7,6 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
-import os
 from datetime import datetime
 
 # Import configuration
@@ -149,16 +148,8 @@ class KoalaBot(commands.Bot):
 
 async def main():
     """Main function to run the bot"""
-    # Get token from environment variables (for Railway deployment)
-    TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-
-    if not TOKEN:
-        logger.error("❌ DISCORD_BOT_TOKEN not found in environment variables.")
-        logger.error("Please set your bot token in Railway environment variables:")
-        logger.error("1. Go to your Railway project")
-        logger.error("2. Go to Settings > Environment Variables")
-        logger.error("3. Add: DISCORD_BOT_TOKEN = your_bot_token_here")
-        return
+    # You'll need to set your bot token here or use environment variables
+    TOKEN = "YOUR_BOT_TOKEN_HERE"  # Replace with your actual bot token
 
     bot = KoalaBot()
 
