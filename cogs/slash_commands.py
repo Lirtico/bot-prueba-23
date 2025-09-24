@@ -26,22 +26,46 @@ class HelpSelect(Select):
         )
 
     async def callback(self, interaction: discord.Interaction):
-        category_key = self.values[0]
-        category_data = COMMAND_CATEGORIES[category_key]
+        try:
+            category_key = self.values[0]
+            category_data = COMMAND_CATEGORIES[category_key]
 
-        embed = discord.Embed(
-            title=category_data["name"],
-            description=category_data["description"],
-            color=category_data["color"]
-        )
+            embed = discord.Embed(
+                title=category_data["name"],
+                description=category_data["description"],
+                color=category_data["color"]
+            )
 
-        # Add commands to embed
-        for command, description in category_data["commands"].items():
-            embed.add_field(name=command, value=description, inline=False)
+            # Add commands to embed
+            for command, description in category_data["commands"].items():
+                embed.add_field(name=command, value=description, inline=False)
 
-        embed.set_footer(text="Usa /help para volver al menú principal")
+            embed.set_footer(text="Usa /help para volver al menú principal")
 
-        await interaction.response.edit_message(embed=embed, view=self.view)
+            await interaction.response.edit_message(embed=embed, view=self.view)
+        except Exception as e:
+            # Log the error and send a user-friendly message
+            print(f"Error in help callback: {e}")
+            try:
+                embed = discord.Embed(
+                    title="❌ Error",
+                    description="Ha ocurrido un error al mostrar la categoría. Por favor, intenta usar `/help` nuevamente.",
+                    color=0xff0000
+                )
+                await interaction.response.edit_message(embed=embed, view=None)
+            except:
+                # If we can't edit the message, send a new one
+                try:
+                    await interaction.response.send_message(
+                        embed=discord.Embed(
+                            title="❌ Error",
+                            description="Ha ocurrido un error. Por favor, intenta usar `/help` nuevamente.",
+                            color=0xff0000
+                        ),
+                        ephemeral=True
+                    )
+                except:
+                    pass
 
 class HelpView(View):
     def __init__(self, bot):
