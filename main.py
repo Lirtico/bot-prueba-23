@@ -46,9 +46,9 @@ class KoalaBot(commands.Bot):
         self.last_help_execution = {}  # user_id -> timestamp
 
         # Load cogs
-        self.load_cogs()
+        asyncio.create_task(self.load_cogs())
 
-    def load_cogs(self):
+    async def load_cogs(self):
         """Load all bot cogs"""
         cogs_to_load = [
             'cogs.moderation',
@@ -64,7 +64,7 @@ class KoalaBot(commands.Bot):
 
         for cog in cogs_to_load:
             try:
-                self.load_extension(cog)
+                await self.load_extension(cog)
                 logger.info(f"✅ Loaded cog: {cog}")
             except Exception as e:
                 logger.error(f"❌ Failed to load cog {cog}: {e}")
@@ -83,9 +83,13 @@ class KoalaBot(commands.Bot):
         logger.info(f"📦 Loaded cogs: {list(self.extensions.keys())}")
 
         # Check slash commands before sync
-        logger.info(f"📋 Slash commands in tree before sync: {len(self.tree._children)}")
-        for name, cmd in self.tree._children.items():
-            logger.info(f"  - /{name}: {cmd.description}")
+        try:
+            commands_before = list(self.tree.walk_commands())
+            logger.info(f"📋 Slash commands in tree before sync: {len(commands_before)}")
+            for cmd in commands_before:
+                logger.info(f"  - /{cmd.name}: {cmd.description}")
+        except Exception as e:
+            logger.warning(f"Could not get commands before sync: {e}")
 
         # Sync slash commands globally
         try:
@@ -97,9 +101,13 @@ class KoalaBot(commands.Bot):
             logger.error(f"❌ Failed to sync slash commands: {e}")
 
         # Check slash commands after sync
-        logger.info(f"📋 Slash commands in tree after sync: {len(self.tree._children)}")
-        for name, cmd in self.tree._children.items():
-            logger.info(f"  - /{name}: {cmd.description}")
+        try:
+            commands_after = list(self.tree.walk_commands())
+            logger.info(f"📋 Slash commands in tree after sync: {len(commands_after)}")
+            for cmd in commands_after:
+                logger.info(f"  - /{cmd.name}: {cmd.description}")
+        except Exception as e:
+            logger.warning(f"Could not get commands after sync: {e}")
 
         # Set bot presence
         await self.change_presence(
