@@ -1,0 +1,6 @@
+Testing GIF API...
+
+--- Testing anime slap ---
+Generated URL: https://media.tenor.com/4c6o4l1lE8AAAAAC/anime-slap.gif
+URL Status: 404
+Content-Type: image/gif
