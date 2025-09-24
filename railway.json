@@ -3,8 +3,19 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python bot.py",
+    "startCommand": "python main.py",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "restartPolicyMaxRetries": 10,
+    "healthcheckPath": "/",
+    "healthcheckTimeout": 100
+  },
+  "environments": {
+    "production": {
+      "variables": {
+        "DISCORD_BOT_TOKEN": "${{ secrets.DISCORD_BOT_TOKEN }}",
+        "PYTHONPATH": ".",
+        "PYTHONUNBUFFERED": "1"
+      }
+    }
   }
 }

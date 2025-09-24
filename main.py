@@ -7,6 +7,7 @@ import discord
 from discord.ext import commands
 import asyncio
 import logging
+import os
 from datetime import datetime
 
 # Import configuration
@@ -78,6 +79,13 @@ class KoalaBot(commands.Bot):
         logger.info(f"🏠 Connected to {len(self.guilds)} servers")
         logger.info(f"👥 Serving {sum(guild.member_count for guild in self.guilds)} users")
 
+        # Sync slash commands globally
+        try:
+            synced = await self.tree.sync()
+            logger.info(f"✅ Synced {len(synced)} slash commands globally")
+        except Exception as e:
+            logger.error(f"❌ Failed to sync slash commands: {e}")
+
         # Set bot presence
         await self.change_presence(
             activity=discord.Activity(
@@ -141,8 +149,16 @@ class KoalaBot(commands.Bot):
 
 async def main():
     """Main function to run the bot"""
-    # You'll need to set your bot token here or use environment variables
-    TOKEN = "YOUR_BOT_TOKEN_HERE"  # Replace with your actual bot token
+    # Get token from environment variables (for Railway deployment)
+    TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+
+    if not TOKEN:
+        logger.error("❌ DISCORD_BOT_TOKEN not found in environment variables.")
+        logger.error("Please set your bot token in Railway environment variables:")
+        logger.error("1. Go to your Railway project")
+        logger.error("2. Go to Settings > Environment Variables")
+        logger.error("3. Add: DISCORD_BOT_TOKEN = your_bot_token_here")
+        return
 
     bot = KoalaBot()
 
