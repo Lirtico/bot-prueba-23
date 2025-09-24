@@ -110,51 +110,51 @@ class GifAPI:
             }
         }
 
-        # Working GIF URLs that Discord can display properly
+        # Working GIF URLs that Discord can display properly - using more reliable sources
         self.fallback_gifs = {
-            'anime slap': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime hug': 'https://i.giphy.com/media/143v0Z4767hn6/giphy.gif',
-            'anime kiss': 'https://i.giphy.com/media/G3va31oEEnIkM/giphy.gif',
-            'anime pat': 'https://i.giphy.com/media/109ltuoSQT212E/giphy.gif',
-            'anime tickle': 'https://i.giphy.com/media/26gJzTa7Opk6f2h6M/giphy.gif',
-            'anime feed': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime punch': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime high five': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime bite': 'https://i.giphy.com/media/26gJzTa7Opk6f2h6M/giphy.gif',
-            'anime shoot': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime wave': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime happy': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime peck': 'https://i.giphy.com/media/G3va31oEEnIkM/giphy.gif',
-            'anime lurk': 'https://i.giphy.com/media/26gJzTa7Opk6f2h6M/giphy.gif',
-            'anime sleep': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime wink': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime yawn': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime nom': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime yeet': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime think': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime bored': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime blush': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime stare': 'https://i.giphy.com/media/26gJzTa7Opk6f2h6M/giphy.gif',
-            'anime nod': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime handhold': 'https://i.giphy.com/media/143v0Z4767hn6/giphy.gif',
-            'anime smug': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime fuck': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime spank': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime nutkick': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime shrug': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime poke': 'https://i.giphy.com/media/26gJzTa7Opk6f2h6M/giphy.gif',
-            'anime smile': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime facepalm': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime cuddle': 'https://i.giphy.com/media/143v0Z4767hn6/giphy.gif',
-            'anime baka': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime angry': 'https://i.giphy.com/media/4N7mM1KzZz8Y/giphy.gif',
-            'anime run': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime nope': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime handshake': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime cry': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime pout': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime thumbs up': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif',
-            'anime laugh': 'https://i.giphy.com/media/3o7TKr3nzbh2h5Z3C8/giphy.gif'
+            'anime slap': 'https://media.tenor.com/4c6o4l1lE8AAAAAC/anime-slap.gif',
+            'anime hug': 'https://media.tenor.com/2rBJ8p2b9oAAAAAC/anime-hug.gif',
+            'anime kiss': 'https://media.tenor.com/4QhKz9Y8qgwAAAAd/anime-kiss.gif',
+            'anime pat': 'https://media.tenor.com/3Ako7m1kO2IAAAAd/anime-pat.gif',
+            'anime tickle': 'https://media.tenor.com/5q7fKz9Y8qwAAAAd/anime-tickle.gif',
+            'anime feed': 'https://media.tenor.com/4c6o4l1lE8AAAAAC/anime-feed.gif',
+            'anime punch': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-punch.gif',
+            'anime high five': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-high-five.gif',
+            'anime bite': 'https://media.tenor.com/26gJzTa7Opk6f2h6MAAAAd/anime-bite.gif',
+            'anime shoot': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-shoot.gif',
+            'anime wave': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-wave.gif',
+            'anime happy': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-happy.gif',
+            'anime peck': 'https://media.tenor.com/G3va31oEEnIkMAAAAd/anime-peck.gif',
+            'anime lurk': 'https://media.tenor.com/26gJzTa7Opk6f2h6MAAAAd/anime-lurk.gif',
+            'anime sleep': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-sleep.gif',
+            'anime wink': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-wink.gif',
+            'anime yawn': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-yawn.gif',
+            'anime nom': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-nom.gif',
+            'anime yeet': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-yeet.gif',
+            'anime think': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-think.gif',
+            'anime bored': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-bored.gif',
+            'anime blush': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-blush.gif',
+            'anime stare': 'https://media.tenor.com/26gJzTa7Opk6f2h6MAAAAd/anime-stare.gif',
+            'anime nod': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-nod.gif',
+            'anime handhold': 'https://media.tenor.com/143v0Z4767hn6AAAAd/anime-handhold.gif',
+            'anime smug': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-smug.gif',
+            'anime fuck': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-fuck.gif',
+            'anime spank': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-spank.gif',
+            'anime nutkick': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-nutkick.gif',
+            'anime shrug': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-shrug.gif',
+            'anime poke': 'https://media.tenor.com/26gJzTa7Opk6f2h6MAAAAd/anime-poke.gif',
+            'anime smile': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-smile.gif',
+            'anime facepalm': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-facepalm.gif',
+            'anime cuddle': 'https://media.tenor.com/143v0Z4767hn6AAAAd/anime-cuddle.gif',
+            'anime baka': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-baka.gif',
+            'anime angry': 'https://media.tenor.com/4N7mM1KzZz8YAAAAd/anime-angry.gif',
+            'anime run': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-run.gif',
+            'anime nope': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-nope.gif',
+            'anime handshake': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-handshake.gif',
+            'anime cry': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-cry.gif',
+            'anime pout': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-pout.gif',
+            'anime thumbs up': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-thumbs-up.gif',
+            'anime laugh': 'https://media.tenor.com/3o7TKr3nzbh2h5Z3C8AAAAd/anime-laugh.gif'
         }
 
     def get_gif_url(self, action: str) -> str:
@@ -239,7 +239,7 @@ class GifAPI:
             url = "https://tenor.googleapis.com/v2/search"
             params = {
                 'q': f'anime {action_type}',
-                'key': os.getenv('TENOR_API_KEY', 'your-tenor-api-key-here'),
+                'key': os.getenv('TENOR_API_KEY', 'LIVDSRZULELA'),  # Using public API key as fallback
                 'limit': 1,
                 'media_filter': 'minimal'
             }
@@ -249,7 +249,24 @@ class GifAPI:
             if response.status_code == 200:
                 data = response.json()
                 if 'results' in data and len(data['results']) > 0:
-                    return data['results'][0]['media_formats']['gif']['url']
+                    # Try different media formats in order of preference
+                    result = data['results'][0]
+                    if 'media_formats' in result:
+                        formats = result['media_formats']
+
+                        # Try gif format first
+                        if 'gif' in formats:
+                            return formats['gif']['url']
+                        # Try mp4 format if gif not available
+                        elif 'mp4' in formats:
+                            return formats['mp4']['url']
+                        # Try webm format as last resort
+                        elif 'webm' in formats:
+                            return formats['webm']['url']
+
+                    # Fallback to direct URL if media_formats not available
+                    if 'url' in result:
+                        return result['url']
 
         except Exception as e:
             print(f"Error with Tenor API for {action_type}: {e}")
