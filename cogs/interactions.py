@@ -144,9 +144,9 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='feed')
-    async def feed(self, ctx, member: discord.Member):
+    async def feed(self, ctx, member: discord.Member = None):
         """Feed a user with an anime GIF"""
-        if member == ctx.author:
+        if member is not None and member == ctx.author:
             await ctx.send("❌ No puedes alimentarte a ti mismo!")
             return
 
@@ -154,20 +154,25 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime feed")
             print(f"DEBUG: Feed GIF URL: {gif_url}")  # Debug line
 
-            embed = discord.Embed(
-                title="🍜 Alimentar!",
-                description=f"{ctx.author.mention} alimentó a {member.mention}!",
-                color=0xf8c471
-            )
-            embed.set_footer(text="¡Ñam ñam!")
+            if member is None:
+                description = f"{ctx.author.mention} está comiendo."
+            else:
+                description = f"{ctx.author.mention} alimentó a {member.mention}!"
 
+            embed = discord.Embed(
+                title="🍽️ Alimentando!",
+                description=description,
+                color=0xffb3ba
+            )
             embed.set_image(url=gif_url)
+            embed.set_footer(text="¡Ñam!")
+
             await ctx.send(embed=embed)
         except Exception as e:
             print(f"Error in feed command: {e}")
             try:
                 # Fallback: send just the text and URL
-                await ctx.send(f"🍜 **Alimentar!** {ctx.author.mention} alimentó a {member.mention}!\n¡Ñam ñam!\n*(Error al cargar el GIF)*")
+                await ctx.send(f"🍽️ **Alimentando!** {description}\n¡Ñam!\n{gif_url}")
             except Exception as fallback_error:
                 print(f"Fallback error in feed: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
@@ -286,35 +291,6 @@ class InteractionsCog(commands.Cog):
                 await ctx.send(f"🔫 **Disparo!** {ctx.author.mention} disparó a {member.mention}!\n¡Bang! ¡Estás muerto!\n*(Error al cargar el GIF)*")
             except Exception as fallback_error:
                 print(f"Fallback error in shoot: {fallback_error}")
-                await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
-
-    @commands.command(name='wave')
-    async def wave(self, ctx, member: discord.Member):
-        """Wave at a user with an anime GIF"""
-        if member == ctx.author:
-            await ctx.send("❌ No puedes saludarte a ti mismo!")
-            return
-
-        try:
-            gif_url = gif_api.get_gif_url("anime wave")
-            print(f"DEBUG: Wave GIF URL: {gif_url}")  # Debug line
-
-            embed = discord.Embed(
-                title="👋 Saludo!",
-                description=f"{ctx.author.mention} saludó a {member.mention}!",
-                color=0x85c1e9
-            )
-            embed.set_image(url=gif_url)
-            embed.set_footer(text="¡Hola!")
-
-            await ctx.send(embed=embed)
-        except Exception as e:
-            print(f"Error in wave command: {e}")
-            try:
-                # Fallback: send just the text and URL
-                await ctx.send(f"👋 **Saludo!** {ctx.author.mention} saludó a {member.mention}!\n¡Hola!\n*(Error al cargar el GIF)*")
-            except Exception as fallback_error:
-                print(f"Fallback error in wave: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='happy')
@@ -1049,9 +1025,9 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='run')
-    async def run(self, ctx, member: discord.Member):
+    async def run(self, ctx, member: discord.Member = None):
         """Run with a user with an anime GIF"""
-        if member == ctx.author:
+        if member is not None and member == ctx.author:
             await ctx.send("❌ No puedes correr contigo mismo!")
             return
 
@@ -1059,9 +1035,14 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime run")
             print(f"DEBUG: Run GIF URL: {gif_url}")  # Debug line
 
+            if member is None:
+                description = f"{ctx.author.mention} está corriendo."
+            else:
+                description = f"{ctx.author.mention} está corriendo con {member.mention}!"
+
             embed = discord.Embed(
                 title="🏃 Corriendo!",
-                description=f"{ctx.author.mention} está corriendo con {member.mention}!",
+                description=description,
                 color=0x3498db
             )
             embed.set_image(url=gif_url)
@@ -1072,7 +1053,11 @@ class InteractionsCog(commands.Cog):
             print(f"Error in run command: {e}")
             try:
                 # Fallback: send just the text and URL
-                await ctx.send(f"🏃 **Corriendo!** {ctx.author.mention} está corriendo con {member.mention}!\n¡Corre!\n*(Error al cargar el GIF)*")
+                if member is None:
+                    fallback_text = f"🏃 **Corriendo!** {ctx.author.mention} está corriendo.\n¡Corre!\n*(Error al cargar el GIF)*"
+                else:
+                    fallback_text = f"🏃 **Corriendo!** {ctx.author.mention} está corriendo con {member.mention}!\n¡Corre!\n*(Error al cargar el GIF)*"
+                await ctx.send(fallback_text)
             except Exception as fallback_error:
                 print(f"Fallback error in run: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
@@ -1136,9 +1121,9 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='cry')
-    async def cry(self, ctx, member: discord.Member):
+    async def cry(self, ctx, member: discord.Member = None):
         """Cry with a user with an anime GIF"""
-        if member == ctx.author:
+        if member is not None and member == ctx.author:
             await ctx.send("❌ No puedes llorar contigo mismo!")
             return
 
@@ -1146,9 +1131,14 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime cry")
             print(f"DEBUG: Cry GIF URL: {gif_url}")  # Debug line
 
+            if member is None:
+                description = f"{ctx.author.mention} está llorando."
+            else:
+                description = f"{ctx.author.mention} está llorando con {member.mention}!"
+
             embed = discord.Embed(
                 title="😢 Llorando!",
-                description=f"{ctx.author.mention} está llorando con {member.mention}!",
+                description=description,
                 color=0x5d6d7e
             )
             embed.set_image(url=gif_url)
@@ -1159,7 +1149,11 @@ class InteractionsCog(commands.Cog):
             print(f"Error in cry command: {e}")
             try:
                 # Fallback: send just the text and URL
-                await ctx.send(f"😢 **Llorando!** {ctx.author.mention} está llorando con {member.mention}!\n¡Buu!\n*(Error al cargar el GIF)*")
+                if member is None:
+                    fallback_text = f"😢 **Llorando!** {ctx.author.mention} está llorando.\n¡Buu!\n*(Error al cargar el GIF)*"
+                else:
+                    fallback_text = f"😢 **Llorando!** {ctx.author.mention} está llorando con {member.mention}!\n¡Buu!\n*(Error al cargar el GIF)*"
+                await ctx.send(fallback_text)
             except Exception as fallback_error:
                 print(f"Fallback error in cry: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
@@ -1223,9 +1217,9 @@ class InteractionsCog(commands.Cog):
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
 
     @commands.command(name='laugh')
-    async def laugh(self, ctx, member: discord.Member):
+    async def laugh(self, ctx, member: discord.Member = None):
         """Laugh at a user with an anime GIF"""
-        if member == ctx.author:
+        if member is not None and member == ctx.author:
             await ctx.send("❌ No puedes reírte de ti mismo!")
             return
 
@@ -1233,9 +1227,14 @@ class InteractionsCog(commands.Cog):
             gif_url = gif_api.get_gif_url("anime laugh")
             print(f"DEBUG: Laugh GIF URL: {gif_url}")  # Debug line
 
+            if member is None:
+                description = f"{ctx.author.mention} se está riendo."
+            else:
+                description = f"{ctx.author.mention} se rió de {member.mention}!"
+
             embed = discord.Embed(
                 title="😂 Riendo!",
-                description=f"{ctx.author.mention} se rió de {member.mention}!",
+                description=description,
                 color=0xf7dc6f
             )
             embed.set_image(url=gif_url)
@@ -1246,7 +1245,11 @@ class InteractionsCog(commands.Cog):
             print(f"Error in laugh command: {e}")
             try:
                 # Fallback: send just the text and URL
-                await ctx.send(f"😂 **Riendo!** {ctx.author.mention} se rió de {member.mention}!\n¡Ja ja ja!\n*(Error al cargar el GIF)*")
+                if member is None:
+                    fallback_text = f"😂 **Riendo!** {ctx.author.mention} se está riendo.\n¡Ja ja ja!\n*(Error al cargar el GIF)*"
+                else:
+                    fallback_text = f"😂 **Riendo!** {ctx.author.mention} se rió de {member.mention}!\n¡Ja ja ja!\n*(Error al cargar el GIF)*"
+                await ctx.send(fallback_text)
             except Exception as fallback_error:
                 print(f"Fallback error in laugh: {fallback_error}")
                 await ctx.send("¡Error al ejecutar el comando!", ephemeral=True)
