@@ -6,8 +6,9 @@
 - [x] Ensure self-checks are preserved and error checks are added after them
 - [x] Add new !hi command with optional member, anime wave GIF, custom descriptions, self-check, try-except fallback
 - [x] Verify syntax with py_compile
-- [x] Update !sleep, !smug, !smile, !angry to make member optional and change embed message to solitary when no member is mentioned
+- [x] Update !sleep, !smug, !smile, !angry to make member optional and change embed message to solitary when no member is mentioned (removed "solo" from solitary descriptions)
 - [x] Verify syntax with py_compile after updates
+- [x] Fix solitary descriptions by removing "solo" word as per feedback
 
 ## Next Steps
 - [ ] Test the bot to ensure commands work correctly (e.g., run the bot and test !slap without member, with member, self)

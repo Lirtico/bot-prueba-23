@@ -428,7 +428,7 @@ class InteractionsCog(commands.Cog):
             print(f"DEBUG: Sleep GIF URL: {gif_url}")  # Debug line
 
             if member is None:
-                description = f"{ctx.author.mention} está durmiendo solo."
+                description = f"{ctx.author.mention} está durmiendo."
             else:
                 description = f"{ctx.author.mention} está durmiendo con {member.mention}!"
 
@@ -782,7 +782,7 @@ class InteractionsCog(commands.Cog):
             print(f"DEBUG: Smug GIF URL: {gif_url}")  # Debug line
 
             if member is None:
-                description = f"{ctx.author.mention} está siendo presumido solo."
+                description = f"{ctx.author.mention} está siendo presumido."
             else:
                 description = f"{ctx.author.mention} está siendo presumido con {member.mention}!"
 
@@ -982,7 +982,7 @@ class InteractionsCog(commands.Cog):
             print(f"DEBUG: Smile GIF URL: {gif_url}")  # Debug line
 
             if member is None:
-                description = f"{ctx.author.mention} está sonriendo solo."
+                description = f"{ctx.author.mention} está sonriendo."
             else:
                 description = f"{ctx.author.mention} sonrió a {member.mention}!"
 
@@ -1112,7 +1112,7 @@ class InteractionsCog(commands.Cog):
             print(f"DEBUG: Angry GIF URL: {gif_url}")  # Debug line
 
             if member is None:
-                description = f"{ctx.author.mention} está enojado solo."
+                description = f"{ctx.author.mention} está enojado."
             else:
                 description = f"{ctx.author.mention} está enojado con {member.mention}!"
 
