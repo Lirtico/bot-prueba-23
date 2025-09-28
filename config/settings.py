@@ -13,7 +13,8 @@ BOT_CONFIG = {
 API_KEYS = {
     'spotify_client_id': '51120b5915994a27af3b119f1a8641f8',
     'spotify_client_secret': '7cc725e0614d4b7b9a861672cea01e7e',
-    'youtube_api_key': 'AIzaSyBCGPXm3ZmLKk3flredOC03GSWoWhZfgak'
+    'youtube_api_key': 'AIzaSyBCGPXm3ZmLKk3flredOC03GSWoWhZfgak',
+    'genius_access_token': 'SV2tkEueEpwP_WwuTQxF2IUulRf79eoJLTZjZcTMFyqdCQa_-paMNvOUZUM8bYfs'  # Get free token from https://genius.com/developers
 }
 
 # NSFW settings storage (guild_id -> boolean)
