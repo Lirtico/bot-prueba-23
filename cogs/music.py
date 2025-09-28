@@ -87,13 +87,11 @@ class MusicCog(commands.Cog):
             results = self.spotify.search(q=query, type='track', limit=1)
             if results['tracks']['items']:
                 track = results['tracks']['items'][0]
-                return {
-                    'title': f"{track['name']} - {', '.join([a['name'] for a in track['artists']])}",
-                    'url': track['external_urls']['spotify'],
-                    'duration': track['duration_ms'] // 1000,
-                    'thumbnail': track['album']['images'][0]['url'] if track['album']['images'] else '',
-                    'uploader': ', '.join([a['name'] for a in track['artists']])
-                }
+                title = f"{track['name']} - {', '.join([a['name'] for a in track['artists']])}"
+                # Search YouTube for the title
+                youtube_track = await self.search_youtube(title)
+                if youtube_track:
+                    return youtube_track
         except Exception as e:
             logger.error(f"Spotify search error: {e}")
         return None
