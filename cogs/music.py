@@ -27,7 +27,16 @@ class MusicCog(commands.Cog):
             client_secret=API_KEYS['spotify_client_secret']
         ))
         self.youtube = build('youtube', 'v3', developerKey=API_KEYS['youtube_api_key'])
-        self.genius = lyricsgenius.Genius()  # No API key needed for basic use
+        try:
+            token = API_KEYS.get('genius_access_token', '')
+            if token and token != 'your_genius_token_here':
+                self.genius = lyricsgenius.Genius(token)
+            else:
+                self.genius = None
+                logger.warning("Genius token not configured. Lyrics feature disabled.")
+        except Exception as e:
+            logger.error(f"Failed to initialize Genius: {e}")
+            self.genius = None
 
         # yt-dlp options
         self.ydl_opts = {
@@ -97,6 +106,8 @@ class MusicCog(commands.Cog):
         return None
 
     async def get_lyrics(self, song_title):
+        if self.genius is None:
+            return "Lyrics unavailable - Genius API not configured. Get a free token from https://genius.com/developers and add to config/settings.py"
         try:
             song = self.genius.search_song(song_title)
             if song:
