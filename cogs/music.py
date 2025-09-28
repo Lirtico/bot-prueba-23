@@ -77,19 +77,28 @@ class MusicCog(commands.Cog):
         self.volume[guild_id] = max(0.0, min(1.0, value))
 
     async def search_youtube(self, query):
-        with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
-            try:
-                info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
+        try:
+            request = self.youtube.search().list(
+                part='snippet',
+                q=query,
+                type='video',
+                maxResults=1,
+                order='relevance'
+            )
+            response = request.execute()
+            if response['items']:
+                item = response['items'][0]
+                video_id = item['id']['videoId']
                 return {
-                    'title': info['title'],
-                    'url': info['webpage_url'],
-                    'duration': info.get('duration', 0),
-                    'thumbnail': info.get('thumbnail', ''),
-                    'uploader': info.get('uploader', 'Unknown')
+                    'title': item['snippet']['title'],
+                    'url': f"https://www.youtube.com/watch?v={video_id}",
+                    'duration': 0,  # API doesn't provide duration in search; can add separate call if needed
+                    'thumbnail': item['snippet']['thumbnails']['default']['url'],
+                    'uploader': item['snippet']['channelTitle']
                 }
-            except Exception as e:
-                logger.error(f"YouTube search error: {e}")
-                return None
+        except Exception as e:
+            logger.error(f"YouTube API search error: {e}")
+        return None
 
     async def search_spotify(self, query):
         try:
