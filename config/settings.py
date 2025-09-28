@@ -9,5 +9,12 @@ BOT_CONFIG = {
     'help_timeout': 300,  # 5 minutes
 }
 
+# API Keys for music functionality
+API_KEYS = {
+    'spotify_client_id': '51120b5915994a27af3b119f1a8641f8',
+    'spotify_client_secret': '7cc725e0614d4b7b9a861672cea01e7e',
+    'youtube_api_key': 'AIzaSyBCGPXm3ZmLKk3flredOC03GSWoWhZfgak'
+}
+
 # NSFW settings storage (guild_id -> boolean)
 nsfw_settings = {}

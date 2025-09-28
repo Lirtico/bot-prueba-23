@@ -121,7 +121,7 @@ class HelpSelect(Select):
                             name="📊 Estadísticas",
                             value=f"• **{len(COMMAND_CATEGORIES)} categorías**\n"
                                   f"• **{sum(len(cat['commands']) for cat in COMMAND_CATEGORIES.values())} comandos**\n"
-                                  f"• **50+ interacciones** con GIFs",
+                                  f"• **50+ comandos roleplay**",
                             inline=False
                         )
 
@@ -207,7 +207,7 @@ class SlashCommandsCog(commands.Cog):
             name="📊 Estadísticas",
             value=f"• **{len(COMMAND_CATEGORIES)} categorías**\n"
                   f"• **{sum(len(cat['commands']) for cat in COMMAND_CATEGORIES.values())} comandos**\n"
-                  f"• **50+ interacciones** con GIFs",
+                  f"• **50+ comandos roleplay**",
             inline=False
         )
 

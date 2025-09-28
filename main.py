@@ -58,6 +58,7 @@ class KoalaBot(commands.Bot):
             'cogs.utility_commands',
             'cogs.community_commands',
             'cogs.slash_commands',
+            'cogs.music',
             'events.logging_events',
             'events.bot_events'
         ]

@@ -1,17 +1,12 @@
-# TODO List for Discord Bot Interactions Fix
+# Music Commands Implementation TODO
 
-## Completed Tasks
-- [x] Update all interaction commands requiring a member to make the member parameter optional
-- [x] Add error check for when member is None: send "❌ Debes mencionar a alguien para usar este comando."
-- [x] Ensure self-checks are preserved and error checks are added after them
-- [x] Add new !hi command with optional member, anime wave GIF, custom descriptions, self-check, try-except fallback
-- [x] Verify syntax with py_compile
-- [x] Update !sleep, !smug, !smile, !angry to make member optional and change embed message to solitary when no member is mentioned (removed "solo" from solitary descriptions)
-- [x] Verify syntax with py_compile after updates
-- [x] Fix solitary descriptions by removing "solo" word as per feedback
+## Steps to Complete
 
-## Next Steps
-- [ ] Test the bot to ensure commands work correctly (e.g., run the bot and test !slap without member, with member, self)
-- [ ] Test !hi command specifically
-- [ ] Test updated solitary commands (!sleep, !smug, !smile, !angry)
-- [ ] If issues, debug and fix
+- [x] Update requirements.txt with music dependencies (yt-dlp, spotipy, google-api-python-client, lyricsgenius)
+- [x] Read config/settings.py and add API keys if not present (Spotify client_id/secret, YouTube API key)
+- [x] Create cogs/music.py with full music functionality (prefix and slash commands, queue system, voice handling, API integrations)
+- [x] Update main.py to load 'cogs.music' in cogs_to_load list
+- [x] Update config/categories.py to add "music" category with all commands listed
+- [ ] Install new dependencies via pip install -r requirements.txt
+- [ ] Test music commands (join VC, /play, /pause, /lyrics, etc.)
+- [ ] Sync slash commands and verify in /help that music category appears
