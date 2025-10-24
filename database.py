@@ -7,7 +7,7 @@ import asyncio
 from typing import Optional, List, Dict, Any, Union
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, BigInteger, ForeignKey, Index, event
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, BigInteger, ForeignKey, Index, event, Float
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import sessionmaker, relationship, declarative_base
 from sqlalchemy.pool import QueuePool
@@ -293,6 +293,225 @@ class RateLimit(Base):
     __table_args__ = (
         Index('ix_rate_limits_guild_user_cmd', 'guild_id', 'user_id', 'command_name'),
         Index('ix_rate_limits_window_end', 'window_end'),
+    )
+
+class EconomySettings(Base):
+    """Economy settings for guilds"""
+    __tablename__ = "economy_settings"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    currency_symbol = Column(String(10), default="$")
+    start_balance = Column(BigInteger, default=100)
+    max_balance = Column(BigInteger, default=1000000)
+    audit_log_channel_id = Column(BigInteger, nullable=True)
+    work_cooldown = Column(Integer, default=3600)  # seconds
+    slut_cooldown = Column(Integer, default=3600)
+    crime_cooldown = Column(Integer, default=3600)
+    rob_cooldown = Column(Integer, default=3600)
+    work_min_payout = Column(BigInteger, default=10)
+    work_max_payout = Column(BigInteger, default=100)
+    slut_min_payout = Column(BigInteger, default=20)
+    slut_max_payout = Column(BigInteger, default=200)
+    crime_min_payout = Column(BigInteger, default=50)
+    crime_max_payout = Column(BigInteger, default=500)
+    crime_fail_rate = Column(Float, default=0.4)
+    slut_fail_rate = Column(Float, default=0.3)
+    fine_type = Column(String(10), default="percent")  # percent or fixed
+    fine_percent = Column(Float, default=0.1)
+    fine_fixed = Column(BigInteger, default=50)
+    chat_money_enabled = Column(Boolean, default=False)
+    chat_money_min = Column(BigInteger, default=1)
+    chat_money_max = Column(BigInteger, default=5)
+    chat_money_cooldown = Column(Integer, default=60)
+    chat_money_channels = Column(Text, nullable=True)  # JSON array of channel IDs
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_economy_settings_guild_id', 'guild_id'),
+    )
+
+class UserEconomy(Base):
+    """User economy data"""
+    __tablename__ = "user_economy"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    cash = Column(BigInteger, default=0)
+    bank = Column(BigInteger, default=0)
+    total_earned = Column(BigInteger, default=0)
+    last_work = Column(DateTime, nullable=True)
+    last_slut = Column(DateTime, nullable=True)
+    last_crime = Column(DateTime, nullable=True)
+    last_rob = Column(DateTime, nullable=True)
+    last_chat_money = Column(DateTime, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+    user = relationship("User")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_user_economy_guild_user', 'guild_id', 'user_id'),
+    )
+
+class EconomyTransaction(Base):
+    """Economy transactions for audit log"""
+    __tablename__ = "economy_transactions"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    type = Column(String(50), nullable=False)  # add_money, remove_money, deposit, withdraw, etc.
+    amount = Column(BigInteger, nullable=False)
+    reason = Column(Text, nullable=True)
+    moderator_id = Column(BigInteger, nullable=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+    user = relationship("User")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_economy_transactions_guild_user', 'guild_id', 'user_id'),
+        Index('ix_economy_transactions_timestamp', 'timestamp'),
+    )
+
+class EconomyItem(Base):
+    """Store items"""
+    __tablename__ = "economy_items"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    name = Column(String(100), nullable=False)
+    description = Column(Text, nullable=True)
+    price = Column(BigInteger, nullable=False)
+    sell_price = Column(BigInteger, nullable=True)
+    stock = Column(Integer, default=-1)  # -1 for unlimited
+    role_required = Column(BigInteger, nullable=True)  # role ID required to buy
+    role_granted = Column(BigInteger, nullable=True)  # role ID granted on use
+    usable = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_economy_items_guild_id', 'guild_id'),
+    )
+
+class UserItem(Base):
+    """User inventory"""
+    __tablename__ = "user_items"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    item_id = Column(BigInteger, ForeignKey('economy_items.id'), nullable=False)
+    quantity = Column(Integer, default=1)
+    acquired_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+    user = relationship("User")
+    item = relationship("EconomyItem")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_user_items_guild_user', 'guild_id', 'user_id'),
+        Index('ix_user_items_item_id', 'item_id'),
+    )
+
+class RoleIncome(Base):
+    """Role-based income"""
+    __tablename__ = "role_income"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    role_id = Column(BigInteger, nullable=False)
+    income_amount = Column(BigInteger, nullable=False)
+    cooldown = Column(Integer, default=86400)  # seconds
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_role_income_guild_role', 'guild_id', 'role_id'),
+    )
+
+class UserRoleIncome(Base):
+    """User role income tracking"""
+    __tablename__ = "user_role_income"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
+    role_income_id = Column(BigInteger, ForeignKey('role_income.id'), nullable=False)
+    last_collected = Column(DateTime, nullable=True)
+
+    # Relationships
+    guild = relationship("Guild")
+    user = relationship("User")
+    role_income = relationship("RoleIncome")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_user_role_income_guild_user', 'guild_id', 'user_id'),
+    )
+
+class CustomReply(Base):
+    """Custom replies for commands"""
+    __tablename__ = "custom_replies"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    command = Column(String(20), nullable=False)  # work, slut, crime
+    type = Column(String(10), nullable=False)  # success, fail
+    reply = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_custom_replies_guild_cmd', 'guild_id', 'command'),
+    )
+
+class GameSettings(Base):
+    """Game settings for guilds"""
+    __tablename__ = "game_settings"
+
+    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    guild_id = Column(BigInteger, ForeignKey('guilds.id'), nullable=False)
+    min_bet = Column(BigInteger, default=1)
+    max_bet = Column(BigInteger, default=10000)
+    blackjack_decks = Column(Integer, default=1)
+    game_cooldown = Column(Integer, default=10)  # seconds
+    slot_symbols = Column(Text, default='["🍒", "🍊", "🍇", "🍉", "⭐", "💎"]')  # JSON
+    cock_fight_win_chance = Column(Float, default=0.5)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    guild = relationship("Guild")
+
+    # Indexes
+    __table_args__ = (
+        Index('ix_game_settings_guild_id', 'guild_id'),
     )
 
 class DatabaseManager:
@@ -707,6 +926,14 @@ class DatabaseManager:
                 stats['log_entries'] = await session.query(LogEntry).count()
                 stats['jail_records'] = await session.query(JailRecord).count()
                 stats['command_usage'] = await session.query(CommandUsage).count()
+                stats['economy_settings'] = await session.query(EconomySettings).count()
+                stats['user_economy'] = await session.query(UserEconomy).count()
+                stats['economy_transactions'] = await session.query(EconomyTransaction).count()
+                stats['economy_items'] = await session.query(EconomyItem).count()
+                stats['user_items'] = await session.query(UserItem).count()
+                stats['role_income'] = await session.query(RoleIncome).count()
+                stats['custom_replies'] = await session.query(CustomReply).count()
+                stats['game_settings'] = await session.query(GameSettings).count()
 
                 # Get recent activity
                 recent_logs = await session.query(LogEntry).filter(
@@ -722,6 +949,449 @@ class DatabaseManager:
             except Exception as e:
                 logger.error(f"Failed to get database stats: {e}")
                 return {}
+
+    # Economy-related methods
+    async def get_or_create_economy_settings(self, guild_id: int) -> EconomySettings:
+        """Get or create economy settings for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                settings = await session.query(EconomySettings).filter_by(guild_id=guild_id).first()
+                if settings:
+                    return settings
+
+                settings = EconomySettings(guild_id=guild_id)
+                session.add(settings)
+                await session.commit()
+                await session.refresh(settings)
+                return settings
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to get or create economy settings for guild {guild_id}: {e}")
+                raise
+
+    async def update_economy_settings(self, guild_id: int, **kwargs) -> EconomySettings:
+        """Update economy settings for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                settings = await session.query(EconomySettings).filter_by(guild_id=guild_id).first()
+                if not settings:
+                    settings = EconomySettings(guild_id=guild_id)
+                    session.add(settings)
+
+                for key, value in kwargs.items():
+                    if hasattr(settings, key):
+                        setattr(settings, key, value)
+
+                await session.commit()
+                await session.refresh(settings)
+                return settings
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to update economy settings for guild {guild_id}: {e}")
+                raise
+
+    async def get_or_create_user_economy(self, guild_id: int, user_id: int) -> UserEconomy:
+        """Get or create user economy data"""
+        async with self.get_async_session() as session:
+            try:
+                economy = await session.query(UserEconomy).filter_by(guild_id=guild_id, user_id=user_id).first()
+                if economy:
+                    return economy
+
+                settings = await self.get_or_create_economy_settings(guild_id)
+                economy = UserEconomy(
+                    guild_id=guild_id,
+                    user_id=user_id,
+                    cash=settings.start_balance
+                )
+                session.add(economy)
+                await session.commit()
+                await session.refresh(economy)
+                return economy
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to get or create user economy for user {user_id} in guild {guild_id}: {e}")
+                raise
+
+    async def update_user_balance(self, guild_id: int, user_id: int, cash_change: int = 0, bank_change: int = 0,
+                                 reason: str = None, moderator_id: int = None) -> UserEconomy:
+        """Update user balance and log transaction"""
+        async with self.get_async_session() as session:
+            try:
+                economy = await session.query(UserEconomy).filter_by(guild_id=guild_id, user_id=user_id).first()
+                if not economy:
+                    economy = await self.get_or_create_user_economy(guild_id, user_id)
+
+                # Check max balance
+                settings = await self.get_or_create_economy_settings(guild_id)
+                new_cash = economy.cash + cash_change
+                new_bank = economy.bank + bank_change
+
+                if new_cash > settings.max_balance or new_bank > settings.max_balance:
+                    raise ValueError(f"Balance would exceed maximum of {settings.max_balance}")
+
+                if new_cash < 0 or new_bank < 0:
+                    raise ValueError("Balance cannot be negative")
+
+                economy.cash = new_cash
+                economy.bank = new_bank
+                economy.total_earned += max(0, cash_change) + max(0, bank_change)
+
+                # Log transaction
+                if cash_change != 0 or bank_change != 0:
+                    transaction = EconomyTransaction(
+                        guild_id=guild_id,
+                        user_id=user_id,
+                        type="balance_update",
+                        amount=cash_change + bank_change,
+                        reason=reason,
+                        moderator_id=moderator_id
+                    )
+                    session.add(transaction)
+
+                await session.commit()
+                await session.refresh(economy)
+                return economy
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to update balance for user {user_id} in guild {guild_id}: {e}")
+                raise
+
+    async def get_leaderboard(self, guild_id: int, limit: int = 10) -> List[UserEconomy]:
+        """Get economy leaderboard for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                result = await session.query(UserEconomy).filter_by(guild_id=guild_id).order_by(
+                    (UserEconomy.cash + UserEconomy.bank).desc()
+                ).limit(limit).all()
+                return result
+
+            except Exception as e:
+                logger.error(f"Failed to get leaderboard for guild {guild_id}: {e}")
+                return []
+
+    async def get_game_settings(self, guild_id: int) -> GameSettings:
+        """Get game settings for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                settings = await session.query(GameSettings).filter_by(guild_id=guild_id).first()
+                if settings:
+                    return settings
+
+                settings = GameSettings(guild_id=guild_id)
+                session.add(settings)
+                await session.commit()
+                await session.refresh(settings)
+                return settings
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to get game settings for guild {guild_id}: {e}")
+                raise
+
+    async def update_game_settings(self, guild_id: int, **kwargs) -> GameSettings:
+        """Update game settings for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                settings = await session.query(GameSettings).filter_by(guild_id=guild_id).first()
+                if not settings:
+                    settings = GameSettings(guild_id=guild_id)
+                    session.add(settings)
+
+                for key, value in kwargs.items():
+                    if hasattr(settings, key):
+                        setattr(settings, key, value)
+
+                await session.commit()
+                await session.refresh(settings)
+                return settings
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to update game settings for guild {guild_id}: {e}")
+                raise
+
+    async def add_economy_transaction(self, guild_id: int, user_id: int, transaction_type: str,
+                                    amount: int, reason: str = None, moderator_id: int = None):
+        """Add an economy transaction"""
+        async with self.get_async_session() as session:
+            try:
+                transaction = EconomyTransaction(
+                    guild_id=guild_id,
+                    user_id=user_id,
+                    type=transaction_type,
+                    amount=amount,
+                    reason=reason,
+                    moderator_id=moderator_id
+                )
+                session.add(transaction)
+                await session.commit()
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to add economy transaction: {e}")
+
+    async def get_user_inventory(self, guild_id: int, user_id: int) -> List[UserItem]:
+        """Get user's inventory"""
+        async with self.get_async_session() as session:
+            try:
+                result = await session.query(UserItem).filter_by(guild_id=guild_id, user_id=user_id).all()
+                return result
+
+            except Exception as e:
+                logger.error(f"Failed to get inventory for user {user_id} in guild {guild_id}: {e}")
+                return []
+
+    async def add_item_to_inventory(self, guild_id: int, user_id: int, item_id: int, quantity: int = 1):
+        """Add item to user's inventory"""
+        async with self.get_async_session() as session:
+            try:
+                # Check if user already has this item
+                existing = await session.query(UserItem).filter_by(
+                    guild_id=guild_id, user_id=user_id, item_id=item_id
+                ).first()
+
+                if existing:
+                    existing.quantity += quantity
+                else:
+                    user_item = UserItem(
+                        guild_id=guild_id,
+                        user_id=user_id,
+                        item_id=item_id,
+                        quantity=quantity
+                    )
+                    session.add(user_item)
+
+                await session.commit()
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to add item to inventory: {e}")
+
+    async def remove_item_from_inventory(self, guild_id: int, user_id: int, item_id: int, quantity: int = 1) -> bool:
+        """Remove item from user's inventory"""
+        async with self.get_async_session() as session:
+            try:
+                existing = await session.query(UserItem).filter_by(
+                    guild_id=guild_id, user_id=user_id, item_id=item_id
+                ).first()
+
+                if not existing or existing.quantity < quantity:
+                    return False
+
+                existing.quantity -= quantity
+                if existing.quantity <= 0:
+                    await session.delete(existing)
+
+                await session.commit()
+                return True
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to remove item from inventory: {e}")
+                return False
+
+    async def get_store_items(self, guild_id: int) -> List[EconomyItem]:
+        """Get all store items for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                result = await session.query(EconomyItem).filter_by(guild_id=guild_id).all()
+                return result
+
+            except Exception as e:
+                logger.error(f"Failed to get store items for guild {guild_id}: {e}")
+                return []
+
+    async def create_store_item(self, guild_id: int, name: str, description: str, price: int,
+                              sell_price: int = None, stock: int = -1, role_required: int = None,
+                              role_granted: int = None, usable: bool = False) -> EconomyItem:
+        """Create a new store item"""
+        async with self.get_async_session() as session:
+            try:
+                item = EconomyItem(
+                    guild_id=guild_id,
+                    name=name,
+                    description=description,
+                    price=price,
+                    sell_price=sell_price,
+                    stock=stock,
+                    role_required=role_required,
+                    role_granted=role_granted,
+                    usable=usable
+                )
+                session.add(item)
+                await session.commit()
+                await session.refresh(item)
+                return item
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to create store item: {e}")
+                raise
+
+    async def get_custom_replies(self, guild_id: int, command: str, reply_type: str) -> List[CustomReply]:
+        """Get custom replies for a command"""
+        async with self.get_async_session() as session:
+            try:
+                result = await session.query(CustomReply).filter_by(
+                    guild_id=guild_id, command=command, type=reply_type
+                ).all()
+                return result
+
+            except Exception as e:
+                logger.error(f"Failed to get custom replies: {e}")
+                return []
+
+    async def add_custom_reply(self, guild_id: int, command: str, reply_type: str, reply: str):
+        """Add a custom reply"""
+        async with self.get_async_session() as session:
+            try:
+                custom_reply = CustomReply(
+                    guild_id=guild_id,
+                    command=command,
+                    type=reply_type,
+                    reply=reply
+                )
+                session.add(custom_reply)
+                await session.commit()
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to add custom reply: {e}")
+
+    async def delete_custom_reply(self, guild_id: int, reply_id: int) -> bool:
+        """Delete a custom reply"""
+        async with self.get_async_session() as session:
+            try:
+                reply = await session.get(CustomReply, reply_id)
+                if reply and reply.guild_id == guild_id:
+                    await session.delete(reply)
+                    await session.commit()
+                    return True
+                return False
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to delete custom reply: {e}")
+                return False
+
+    async def get_role_income(self, guild_id: int, role_id: int) -> Optional[RoleIncome]:
+        """Get role income settings"""
+        async with self.get_async_session() as session:
+            try:
+                return await session.query(RoleIncome).filter_by(guild_id=guild_id, role_id=role_id).first()
+
+            except Exception as e:
+                logger.error(f"Failed to get role income: {e}")
+                return None
+
+    async def set_role_income(self, guild_id: int, role_id: int, income_amount: int, cooldown: int = 86400):
+        """Set role income"""
+        async with self.get_async_session() as session:
+            try:
+                role_income = await session.query(RoleIncome).filter_by(guild_id=guild_id, role_id=role_id).first()
+                if role_income:
+                    role_income.income_amount = income_amount
+                    role_income.cooldown = cooldown
+                else:
+                    role_income = RoleIncome(
+                        guild_id=guild_id,
+                        role_id=role_id,
+                        income_amount=income_amount,
+                        cooldown=cooldown
+                    )
+                    session.add(role_income)
+
+                await session.commit()
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to set role income: {e}")
+
+    async def collect_role_income(self, guild_id: int, user_id: int, role_id: int) -> Optional[int]:
+        """Collect role income for user"""
+        async with self.get_async_session() as session:
+            try:
+                role_income = await session.query(RoleIncome).filter_by(guild_id=guild_id, role_id=role_id).first()
+                if not role_income:
+                    return None
+
+                # Check if user can collect
+                user_role_income = await session.query(UserRoleIncome).filter_by(
+                    guild_id=guild_id, user_id=user_id, role_income_id=role_income.id
+                ).first()
+
+                now = datetime.utcnow()
+                if user_role_income and user_role_income.last_collected:
+                    time_diff = (now - user_role_income.last_collected).total_seconds()
+                    if time_diff < role_income.cooldown:
+                        return None  # Not ready yet
+
+                # Update last collected
+                if user_role_income:
+                    user_role_income.last_collected = now
+                else:
+                    user_role_income = UserRoleIncome(
+                        guild_id=guild_id,
+                        user_id=user_id,
+                        role_income_id=role_income.id,
+                        last_collected=now
+                    )
+                    session.add(user_role_income)
+
+                await session.commit()
+                return role_income.income_amount
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to collect role income: {e}")
+                return None
+
+    async def reset_economy(self, guild_id: int):
+        """Reset all economy data for a guild"""
+        async with self.get_async_session() as session:
+            try:
+                # Reset user economies
+                await session.query(UserEconomy).filter_by(guild_id=guild_id).update({"cash": 0, "bank": 0, "total_earned": 0})
+                # Delete transactions
+                await session.query(EconomyTransaction).filter_by(guild_id=guild_id).delete()
+                # Delete user items
+                await session.query(UserItem).filter_by(guild_id=guild_id).delete()
+                # Delete custom replies
+                await session.query(CustomReply).filter_by(guild_id=guild_id).delete()
+
+                await session.commit()
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to reset economy for guild {guild_id}: {e}")
+
+    async def clean_leaderboard(self, guild_id: int):
+        """Remove users from leaderboard that have left the guild"""
+        async with self.get_async_session() as session:
+            try:
+                # Get all users in economy
+                economy_users = await session.query(UserEconomy).filter_by(guild_id=guild_id).all()
+
+                # Check which users are still in the guild (this would need guild member data)
+                # For now, just remove users with 0 balance
+                deleted_count = await session.query(UserEconomy).filter(
+                    UserEconomy.guild_id == guild_id,
+                    UserEconomy.cash == 0,
+                    UserEconomy.bank == 0
+                ).delete()
+
+                await session.commit()
+                return deleted_count
+
+            except Exception as e:
+                await session.rollback()
+                logger.error(f"Failed to clean leaderboard for guild {guild_id}: {e}")
+                return 0
 
 # Global database manager instance
 db_manager = DatabaseManager()
